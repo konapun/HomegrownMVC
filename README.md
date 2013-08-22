@@ -13,11 +13,26 @@ to a controller. Since the context is an object you instantiate, you can use any
 ## Using routes
 HomegrownMVC uses a router to locate controllers.
 ```php
-$context = new Context($httpRequest, $dbh, $viewEngine);
-$router = new Router($context);
+/*
+ * This could be a snippet from your index.php file
+ */
 
-$router->redirect('/', '/home'); // example.com and example.com/ will redirect to example.com/home (without altering the URL)
-$router->handleRoute(); // If no route is given, the current URL is used
+$context = new Context($httpRequest, $dbh, $viewEngine);
+$router = new Router();
+
+// Redirect example.com and example.com/ to example.com/home (without altering the URL)
+$router->redirect('/', '/home');
+
+// Create controllers
+$indexController = new IndexController($context);
+$searchController = new SearchController($context);
+
+// Associate routes with controllers
+$router->addController($indexController);
+$router->addController($searchController);
+
+// Handle the route. If no route is given, the current URL is used
+$router->handleRoute();
 ```
 
 ## Defining controllers
