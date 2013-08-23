@@ -23,7 +23,7 @@ $router = new Router($context); // router needs to context to pass to its error 
 // Redirect example.com and example.com/ to example.com/home (without altering the URL)
 $router->redirect('/', '/home');
 
-// Create controllers
+// Create controllers: These are custom controllers you define which extend BaseController
 $indexController = new IndexController($context);
 $searchController = new SearchController($context);
 
