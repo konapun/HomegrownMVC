@@ -23,15 +23,10 @@ $router = new Router();
 // Redirect example.com and example.com/ to example.com/home (without altering the URL)
 $router->redirect('/', '/home');
 
-// Create controllers: These are custom controllers you define which extend BaseController
-$indexController = new IndexController($context);
-$searchController = new SearchController($context);
-$errorController = new ErrorController($context);
-
-// Associate routes with controllers
-$router->addController($indexController);
-$router->addController($searchController);
-$router->addController($errorController);
+// Associate routes with controllers. Controllers are custom custrollers you define which extend BaseController
+$router->addController(new IndexController($context));
+$router->addController(new SearchController($context));
+$router->addController(new ErrorController($context));
 
 // Handle the route. If no route is given, the current URL is used
 if (!$router->handleRoute()) {
@@ -40,7 +35,7 @@ if (!$router->handleRoute()) {
 ```
 
 ## Defining controllers
-A HomegrownMVC controller implements the abstract BaseController class.
+A HomegrownMVC controller extends the abstract BaseController class.
 A controller only has to define actions for routes it accepts. Arguments
 to the route are provided through the context
 ```php
