@@ -36,7 +36,7 @@ abstract class BaseController {
 		$context = $parsed['context'];
 		$matchPath = $this->controllerBase . $action;
 		if (($basepos = strpos($action, $this->controllerBase)) !== false) {
-			$action = substr($action, $basepos + strlen($this->controllerBase)+1);
+			$action = substr($action, $basepos + strlen($this->controllerBase));
 		}
 		if (array_key_exists($action, $routes)) {
 			$controllerAction = $routes[$action];
