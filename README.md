@@ -18,7 +18,7 @@ HomegrownMVC uses a router to locate controllers.
  */
 
 $context = new Context($httpRequest, $dbh, $viewEngine);
-$router = new Router($context); // router needs to context to pass to its error controller in case no matches are found
+$router = new Router();
 
 // Redirect example.com and example.com/ to example.com/home (without altering the URL)
 $router->redirect('/', '/home');
@@ -26,13 +26,17 @@ $router->redirect('/', '/home');
 // Create controllers
 $indexController = new IndexController($context);
 $searchController = new SearchController($context);
+$errorController = new ErrorController($context);
 
 // Associate routes with controllers
 $router->addController($indexController);
 $router->addController($searchController);
+$router->addController($errorController);
 
 // Handle the route. If no route is given, the current URL is used
-$router->handleRoute();
+if (!$router->handleRoute()) {
+	$router->handleRoute('404'); // manually reroute to 404 defined in the error controller
+}
 ```
 
 ## Defining controllers

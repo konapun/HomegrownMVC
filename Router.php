@@ -4,15 +4,12 @@
  * 
  * Author: Bremen Braun
  */
-include_once('controllers/ErrorController.php');
 
 class Router {
-	private $context;
 	private $controllers;
 	private $forwards;
 	
-	function __construct($context) {
-		$this->context = $context;
+	function __construct() {
 		$this->controllers = array();
 		$this->forwards = array();
 	}
@@ -29,6 +26,15 @@ class Router {
 		if ($route == null) $route = $_SERVER['REQUEST_URI'];
 		
 		/* See if any controller can handle the URI */
+		$foundRoute = $this->forceFindRoute($route);
+		if (!$foundRoute) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+	private function forceFindRoute($route) {
 		$foundRoute = $this->findRoute($route);
 		if (!$foundRoute) { // try finding route with or without a trailing /, depending on whether or not the original had it
 			if (substr($route, -1) == '/') {
@@ -40,10 +46,8 @@ class Router {
 			
 			$foundRoute = $this->findRoute($route);
 		}
-		if (!$foundRoute) {
-			$errorController = new ErrorController($this->context);
-			$errorController->findRoute('404');
-		}
+		
+		return $foundRoute;
 	}
 	
 	private function findRoute($route) {
@@ -51,7 +55,7 @@ class Router {
 		$foundRoute = false;
 		foreach ($this->controllers as $controller) {
 			try {
-				$controller->findRoute($route);
+				$controller->findRoute($route); 
 				$foundRoute = true;
 				break;
 			}

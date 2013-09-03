@@ -2,7 +2,7 @@
 include_once('controllers/BaseController.php');
 
 /*
- * Connect to error views which the router will manually redirect to
+ * Sample error controller with routes defined by error codes
  */
 class ErrorController extends BaseController {
 	protected function setupRoutes() {
