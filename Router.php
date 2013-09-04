@@ -69,7 +69,7 @@ class Router {
 		$foundRoute = false;
 		foreach ($this->controllers as $controller) {
 			try {
-				$controller->findRoute($route); 
+				$controller->invokeRoute($route); 
 				$foundRoute = true;
 				break;
 			}

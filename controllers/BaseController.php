@@ -24,7 +24,7 @@ abstract class BaseController {
 	/*
 	 * This function is called by the router
 	 */
-	function findRoute($url) {
+	function invokeRoute($url) {
 		if ($this->controllerBase && substr($this->controllerBase, -1) != '/') {
 			$this->controllerBase .= '/';
 		}
