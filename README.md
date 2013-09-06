@@ -41,7 +41,7 @@ to the route are provided through the context
 ```php
 class SearchController extends BaseController {
 	protected function setupRoutes() {
-		$this->controllerBase('/search');
+		$this->controllerBase('/search/');
 		
 		return array(
 			'person' => function($context) { //maps to www.example.com/search/person
