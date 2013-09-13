@@ -76,7 +76,13 @@ abstract class BaseController {
 		$kvs = preg_split('/&/', $argstr);
 		if (is_array($kvs)) {
 			foreach ($kvs as $kv) {
-				list($key, $value) = preg_split('/=/', $kv);
+				$split = preg_split('/=/', $kv);
+				$key = $split[0];
+				$value = null;
+				if (count($split) > 1) {
+					$value = $split[1];
+				}
+				
 				$args[$key] = $value;
 			}
 		}
