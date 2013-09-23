@@ -29,6 +29,27 @@ class Router {
 	}
 	
 	/*
+	 * Automatically load all controllers in a directory, given there is
+	 * a single controller per file and the controller class has the same
+	 * name as the file, minus the .php extension
+	 */
+	function autoloadControllers($context, $directory='controllers') {
+		if (is_dir($directory)) {
+			foreach (glob("$directory/*.php") as $phpFile) {
+				include_once($phpFile);
+				
+				$className = $this->getClassnameFromFile(basename($phpFile));
+				if ($className) {
+					$class = new ReflectionClass($className);
+					if ($class->isInstantiable()) {
+						$this->addController($class->newInstance($context));
+					}
+				}
+			}
+		}
+	}
+	
+	/*
 	 * Invoke an action from a controller which provides the specified route.
 	 * If no route is given, the current URL is used.
 	 * Returns true or false depending on whether or not the route was handled
@@ -93,6 +114,12 @@ class Router {
 		}
 		
 		return $forwarded;
+	}
+	
+	private function getClassnameFromFile($file) {
+		if (preg_match('/(.*)\.php/', $file, $matches)) {
+			return $matches[1];
+		}
 	}
 }
 

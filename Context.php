@@ -6,6 +6,7 @@ class Context {
 	private $request;
 	private $dbHandle;
 	private $viewEngine;
+	private $route;
 	
 	function __construct($request, $databaseHandle, $viewEngine) {
 		$this->request = $request;
@@ -23,6 +24,10 @@ class Context {
 	
 	function getViewEngine() {
 		return $this->viewEngine;
+	}
+	
+	function getRoute() {
+	
 	}
 }
 ?>

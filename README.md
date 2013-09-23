@@ -34,6 +34,31 @@ if (!$router->handleRoute()) {
 }
 ```
 
+
+Alternatively, the router can automatically locate and add controllers for you, given that
+there is a single controller class per file and the controller class name is the same as
+the file name, minus the .php extension.
+
+```php
+/*
+ * Example from above, but using the controller autoloader
+ */
+
+$context = new Context($httpRequest, $dbh, $viewEngine);
+$router = new Router();
+
+// Redirect example.com and example.com/ to example.com/home (without altering the URL)
+$router->redirect('/', '/home');
+
+// Let the router locate, instantiate, and add the controllers for you
+$router->autoloadControllers($context, 'controllers'); // the 2nd arg is the directory containing the controllers (default: 'controllers')
+
+// Handle the route. If no route is given, the current URL is used
+if (!$router->handleRoute()) {
+	$router->handleRoute('404'); // manually reroute to 404 defined in the error controller
+}
+```
+
 ## Defining controllers
 A HomegrownMVC controller extends the abstract BaseController class.
 A controller only has to define actions for routes it accepts. Arguments
