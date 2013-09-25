@@ -91,3 +91,17 @@ class RerouteController extends BaseController {
 	}
 }
 ```
+
+You can also reroute to a different controller
+```php
+class RerouteController extends BaseController {
+	protected function setupRoutes() {
+		return array(
+			'reroute' => function($context) {
+				$searchController = new SearchController($context);
+				$searchController->invokeRoute('/search/person');
+			}
+		);
+	}
+}
+```
