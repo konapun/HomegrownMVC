@@ -40,16 +40,6 @@ there is a single controller class per file and the controller class name is the
 the file name, minus the .php extension.
 
 ```php
-/*
- * Example from above, but using the controller autoloader
- */
-
-$context = new Context($httpRequest, $dbh, $viewEngine);
-$router = new Router();
-
-// Redirect example.com and example.com/ to example.com/home (without altering the URL)
-$router->redirect('/', '/home');
-
 // Let the router locate, instantiate, and add the controllers for you
 $router->autoloadControllers($context, 'controllers'); // the 2nd arg is the directory containing the controllers (default: 'controllers')
 
@@ -82,4 +72,22 @@ class SearchController extends BaseController {
 			},
 		);
 	}
+```
+
+A controller may conditionally reroute one route to another route defined by the same controller
+```php
+class RerouteController extends BaseController {
+	protected function setupRoutes() {
+		$that = $this;
+		
+		return array(
+			'route1' => function($context) {
+				echo "Doing route1";
+			},
+			'test_reroute' => function($context) use ($that) {
+				$that->invokeRoute('route1');
+			}
+		);
+	}
+}
 ```
