@@ -10,16 +10,27 @@ include_once('errors/RouteNotDefinedException.php');
 abstract class BaseController {
 	private $context;
 	private $controllerBase;
+	private $callbacks;
 	
 	function __construct($context) {
 		$this->context = $context;
 		$this->controllerBase = "";
+		$this->callbacks = array();
 	}
 	
 	/*
 	 * The concrete controller defines this which returns a map of routes to their action
 	 */
 	abstract protected function setupRoutes();
+	
+	/*
+	 * Give a callback to run before invoking a route
+	 * 
+	 * This can be useful for setting active classes in a template based on a route
+	 */
+	function eachRoute($cb) {
+		array_push($this->callbacks, $cb);
+	}
 	
 	/*
 	 * This function is called by the router
@@ -41,6 +52,9 @@ abstract class BaseController {
 		if (array_key_exists($action, $routes)) {
 			$controllerAction = $routes[$action];
 		
+			foreach ($this->callbacks as $cb) {
+				$cb($context);
+			}
 			return $controllerAction($context);
 		}
 		else {
@@ -79,7 +93,7 @@ abstract class BaseController {
 				$split = preg_split('/=/', $kv);
 				$key = $split[0];
 				$value = null;
-				if (count($split) > 1) {
+				if (count($split) > 1) { 
 					$value = $split[1];
 				}
 				

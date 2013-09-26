@@ -2,7 +2,7 @@
 A very small MVC framework minus the M and the V
 
 ### Rationale
-This is a micro MVC framework (well, barely even a framework) born out of necessity as I tried to make a legacy project
+This is a router/controller framework (well, barely even a framework) born out of necessity as I tried to make a legacy project
 I inherited more manageable. It only defines a router and base controller since the project already had models and views.
 As a result, it should work with any templating system and DBAL.
 
@@ -49,10 +49,12 @@ if (!$router->handleRoute()) {
 }
 ```
 
-## Defining controllers
+## Controllers
 A HomegrownMVC controller extends the abstract BaseController class.
 A controller only has to define actions for routes it accepts. Arguments
 to the route are provided through the context
+
+### Defining controllers
 ```php
 class SearchController extends BaseController {
 	protected function setupRoutes() {
@@ -74,7 +76,8 @@ class SearchController extends BaseController {
 	}
 ```
 
-A controller may conditionally reroute one route to another route defined by the same controller
+### Controller rerouting
+A controller may conditionally reroute from one route to another
 ```php
 class RerouteController extends BaseController {
 	protected function setupRoutes() {
@@ -84,24 +87,28 @@ class RerouteController extends BaseController {
 			'route1' => function($context) {
 				echo "Doing route1";
 			},
-			'test_reroute' => function($context) use ($that) {
+			'reroute_same_controller' => function($context) use ($that) {
 				$that->invokeRoute('route1');
+			},
+			'reroute_different_controller' => function($context) {
+				$searchController = new SearchController($context);
+				$searchController->invokeRoute('/search/person');
 			}
 		);
 	}
 }
 ```
 
-You can also reroute to a different controller
+### Pre-route hooks
+You may specify callbacks to run before a route is invoked using `eachRoute`. This is useful for when, for example, you have a navigation controller
+and want to set an active class depending on which nav route is invoked:
 ```php
-class RerouteController extends BaseController {
-	protected function setupRoutes() {
-		return array(
-			'reroute' => function($context) {
-				$searchController = new SearchController($context);
-				$searchController->invokeRoute('/search/person');
-			}
-		);
-	}
+class NavigationController extends BaseController {
+	$this->eachRoute(function($context) {
+		$view = $context->getViewEngine();
+		$route = substr($context->getRequest()->routeName(), 1); // just remove the leading slash; since Homegrown(MV)C doesn't provide a Request class, your exact way of doing this will vary
+		
+		$view->replaceVar("$route-active", 'active'); // since Homegrown(MV)C doesn't provide a view engine, your exact way of doing this will vary
+	});
 }
 ```
