@@ -28,7 +28,7 @@ abstract class BaseController {
 	 * 
 	 * This can be useful for setting active classes in a template based on a route
 	 */
-	function eachRoute($cb) {
+	protected function eachRoute($cb) {
 		array_push($this->callbacks, $cb);
 	}
 	
