@@ -62,23 +62,24 @@ Currently, two types of controllers are defined:
  * Sample controller which is a regular BaseController
  */
 class SearchController extends BaseController {
-	protected function setupRoutes() {
-		$this->controllerBase('/search/');
-		
-		return array(
-			'person' => function($context) { //maps to www.example.com/search/person
-				$request = $context->getRequest();
-				$view = $context->getViewEngine();
-				
-				// This will depend on the object you're using to do HTTP requests
-				$name = $request->getParam('name');
-				
-				// This will depend on your view engine. You may use any, as this tiny framework doesn't provide one
-				$view->replaceVar('name', "Searching for $name");
-				$view->render();
-			},
-		);
-	}
+		protected function setupRoutes() {
+			$this->controllerBase('/search/');
+			
+			return array(
+				'person' => function($context) { //maps to www.example.com/search/person
+					$request = $context->getRequest();
+					$view = $context->getViewEngine();
+					
+					// This will depend on the object you're using to do HTTP requests
+					$name = $request->getParam('name');
+					
+					// This will depend on your view engine. You may use any, as this tiny framework doesn't provide one
+					$view->replaceVar('name', "Searching for $name");
+					$view->render();
+				},
+			);
+		}
+}
 ```
 
   * **WildcardController**: Routes can define wildcards to match
@@ -88,19 +89,19 @@ class SearchController extends BaseController {
  * in the routes
  */
 class UserController extends WildcardController {
-	protected function setupWildcardRoutes() {
-		$this->setWildcardCharacter(':'); // this is the default character, but you can change it to any single character
-		$this->controllerBase('/user/');
-		
-		return array(
-			':uid/profile' => function($context, $params) {
-				echo "Showing profile for user with ID " . $params['uid'];
-			},
-			':uid/pictures/:pid' => function($context, $params) {
-				echo "Showing picture with ID " . $params['pid'] . " for user with ID " . $params['uid'];
-			}
-		);
-	}
+		protected function setupWildcardRoutes() {
+			$this->setWildcardCharacter(':'); // this is the default character, but you can change it to any single character
+			$this->controllerBase('/user/');
+			
+			return array(
+				':uid/profile' => function($context, $params) {
+					echo "Showing profile for user with ID " . $params['uid'];
+				},
+				':uid/pictures/:pid' => function($context, $params) {
+					echo "Showing picture with ID " . $params['pid'] . " for user with ID " . $params['uid'];
+				}
+			);
+		}
 }
 ```
 
