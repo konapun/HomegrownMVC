@@ -89,8 +89,8 @@ class SearchController extends BaseController {
  * in the routes
  */
 class UserController extends WildcardController {
-	$this->setWildcardCharacter(':'); // this is the default character, but you can change it to any single character
 	protected function setupWildcardRoutes() {
+		$this->setWildcardCharacter(':'); // this is the default character, but you can change it to any single character
 		$this->controllerBase('/user/');
 		
 		return array(
