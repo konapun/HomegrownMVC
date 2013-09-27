@@ -55,7 +55,14 @@ A controller only has to define actions for routes it accepts. Arguments
 to the route are provided through the context
 
 ### Defining controllers
+Currently, two types of controllers are defined:
+  * **BaseController**: Routes are literal paths 
+  * **WildcardController**: Routes can define wildcards to match
+
 ```php
+/*
+ * Sample controller which is a regular BaseController
+ */
 class SearchController extends BaseController {
 	protected function setupRoutes() {
 		$this->controllerBase('/search/');
@@ -74,6 +81,28 @@ class SearchController extends BaseController {
 			},
 		);
 	}
+```
+
+```php
+/*
+ * Sample WildcardController demonstrating the use of wildcards
+ * in the routes
+ */
+class UserController extends WildcardController {
+	$this->setWildcardCharacter(':'); // this is the default character, but you can change it to any single character
+	protected function setupWildcardRoutes() {
+		$this->controllerBase('/user/');
+		
+		return array(
+			':uid/profile' => function($context, $params) {
+				echo "Showing profile for user with ID " . $params['uid'];
+			},
+			':uid/pictures/:pid' => function($context, $params) {
+				echo "Showing picture with ID " . $params['pid'] . " for user with ID " . $params['uid'];
+			}
+		);
+	}
+}
 ```
 
 ### Controller rerouting
