@@ -57,8 +57,6 @@ to the route are provided through the context
 ### Defining controllers
 Currently, two types of controllers are defined:
   * **BaseController**: Routes are literal paths 
-  * **WildcardController**: Routes can define wildcards to match
-
 ```php
 /*
  * Sample controller which is a regular BaseController
@@ -83,6 +81,7 @@ class SearchController extends BaseController {
 	}
 ```
 
+  * **WildcardController**: Routes can define wildcards to match
 ```php
 /*
  * Sample WildcardController demonstrating the use of wildcards
