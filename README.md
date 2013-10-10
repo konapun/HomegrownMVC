@@ -106,7 +106,8 @@ class UserController extends WildcardController {
 ```
 
 ### Controller rerouting
-A controller may conditionally reroute from one route to another
+A controller may conditionally reroute from one route to another. You may wish to do this if you have
+implemented a RESTful API but do not want to build results through AJAX.
 ```php
 class RerouteController extends BaseController {
 	protected function setupRoutes() {
@@ -121,7 +122,7 @@ class RerouteController extends BaseController {
 			},
 			'reroute_different_controller' => function($context) {
 				$searchController = new SearchController($context);
-				$searchController->invokeRoute('/search/person');
+				$searchController->invokeRoute('/search/person?id=1234'); // invoke route as route string, params and all
 			}
 		);
 	}
@@ -129,7 +130,7 @@ class RerouteController extends BaseController {
 ```
 
 ### Pre-route hooks
-You may specify callbacks to run before a route is invoked using `eachRoute`. This is useful for when, for example, you have a navigation controller
+You may specify callbacks to run before a route is invoked using `eachRoute`. This is useful when, for example, you have a navigation controller
 and want to set an active class depending on which nav route is invoked:
 ```php
 class NavigationController extends BaseController {
