@@ -9,6 +9,19 @@ As a result, it should work with any templating system and DBAL.
 ## Contexts
 A context is just an object that bundles together the HTTP request, view engine, and database handle to be passed
 to a controller. Since the context is an object you instantiate, you can use any class for any of these three parameters.
+The context also holds a key-value stash which you can use to pass things around.
+```php
+$context = new Context($httpRequest, $dbh, $viewEngine);
+
+// Get properties set in constructor
+$request = $context->getRequest();
+$dbh = $context->getDatabaseHandle();
+$view = $context->getViewEngine();
+
+// Store in and receive from the stash
+$context->stash('key', 'value');
+$context->stash('key'); // returns 'value'
+```
 
 ## Using routes
 HomegrownMVC uses a router to locate controllers.
