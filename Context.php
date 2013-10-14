@@ -6,12 +6,13 @@ class Context {
 	private $request;
 	private $dbHandle;
 	private $viewEngine;
-	private $route;
+	private $stash;
 	
 	function __construct($request, $databaseHandle, $viewEngine) {
 		$this->request = $request;
 		$this->dbHandle = $databaseHandle;
 		$this->viewEngine = $viewEngine;
+		$this->stash = array();
 	}
 	
 	function getRequest() {
@@ -26,8 +27,14 @@ class Context {
 		return $this->viewEngine;
 	}
 	
-	function getRoute() {
-	
+	function stash($key, $val=null) {
+		if ($val != null) {
+			$this->stash[$key] = $val;
+		}
+		
+		if (array_key_exists($key, $this->stash)) {
+			return $this->stash[$key];
+		}
 	}
 }
 ?>
