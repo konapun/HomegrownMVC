@@ -53,7 +53,7 @@ abstract class BaseController {
 			$controllerAction = $routes[$action];
 		
 			foreach ($this->callbacks as $cb) {
-				$cb($context);
+				if ($cb($context) === false) break;
 			}
 			return $controllerAction($context);
 		}
