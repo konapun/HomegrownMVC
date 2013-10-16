@@ -147,11 +147,58 @@ You may specify callbacks to run before a route is invoked using `eachRoute`. Th
 and want to set an active class depending on which nav route is invoked:
 ```php
 class NavigationController extends BaseController {
-	$this->eachRoute(function($context) {
-		$view = $context->getViewEngine();
-		$route = substr($context->getRequest()->routeName(), 1); // just remove the leading slash; since Homegrown(MV)C doesn't provide a Request class, your exact way of doing this will vary
+	protected function setupRoutes() {
+		$this->eachRoute(function($context) {
+			$view = $context->getViewEngine();
+			$route = substr($context->getRequest()->routeName(), 1); // just remove the leading slash; since Homegrown(MV)C doesn't provide a Request class, your exact way of doing this will vary
+			
+			$view->replaceVar("$route-active", 'active'); // since Homegrown(MV)C doesn't provide a view engine, your exact way of doing this will vary
+		});
 		
-		$view->replaceVar("$route-active", 'active'); // since Homegrown(MV)C doesn't provide a view engine, your exact way of doing this will vary
-	});
+		return array(
+			// ...
+		);
+	}
+}
+```
+
+## Working with the stash
+The context's stash is a general-purpose key/value store.
+Here is an example of using the stash to store a forward route for a route that requires a login:
+```php
+class AdminController extends BaseController {
+	protected function setupRoutes() {
+		$this->controllerBase('/admin/');
+		
+		$that = $this;
+		$user = UserModel::getInstance();
+		return array(
+			'login' => function($context) use ($that, $user) {
+				$forwardRoute = $context->stash('forward-route') or '/admin/overview';
+				if ($user->isLoggedIn()) {
+					$that->invokeRoute($forwardRoute);
+					return;
+				}
+				else {
+					// authenticate user
+					// ...
+					
+					// user has been authenticated by this point, so redirect them to the page they were trying for
+					$that->invokeRoute($forwardRoute);
+				}
+			},
+			'viewUsers' => function($context) use ($that, $user) {
+				if (!$user->isLoggedIn()) {
+					$context->stash('forward-route', '/admin/viewUsers');
+					$that->invokeRoute('/admin/login'); // after authentication, login will invoke this route
+					return;
+				}
+				// ...
+			},
+			'overview' => function($context) {
+				// ...
+			}
+		);
+	}
 }
 ```
