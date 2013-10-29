@@ -84,7 +84,7 @@ abstract class WildcardController extends BaseController {
 			}
 			
 			$expandedRoute = implode('/', $expandedRoute); // rejoin the route string
-			$expandedRoutes[$expandedRoute] = function($context) use (&$params, &$action) { // curry to match the signature that parent::invokeRoute understands
+			$expandedRoutes[$expandedRoute] = function($context) use (&$params, $action) { // curry to match the signature that parent::invokeRoute understands
 				$action($context, $params);
 			};
 		}
