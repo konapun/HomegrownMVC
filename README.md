@@ -143,12 +143,13 @@ class RerouteController extends BaseController {
 ```
 
 ### Pre-route hooks
-You may specify callbacks to run before a route is invoked using `eachRoute`. This is useful when, for example, you have a navigation controller
-and want to set an active class depending on which nav route is invoked:
+You may specify callbacks to run before a route is invoked using `beforeRoutes`. This is useful when, for example, you have a navigation controller
+and want to set an active class depending on which nav route is invoked. You can stop the rest of the pre-route hooks from being called by returning
+`false` from the callback
 ```php
 class NavigationController extends BaseController {
 	protected function setupRoutes() {
-		$this->eachRoute(function($context) {
+		$this->beforeRoutes(function($context) {
 			$view = $context->getViewEngine();
 			$route = substr($context->getRequest()->routeName(), 1); // just remove the leading slash; since Homegrown(MV)C doesn't provide a Request class, your exact way of doing this will vary
 			
@@ -158,6 +159,20 @@ class NavigationController extends BaseController {
 		return array(
 			// ...
 		);
+	}
+}
+```
+
+### Post-route hooks
+These are just like pre-route hooks but fire after a route is invoked. Just as before, you can return `false` to terminate running the rest of the post-route callbacks
+```php
+class TestController extends BaseController {
+	protected function setupRoutes() {
+		$this->afterRoutes(function($context) {
+			$view = $context->getViewEngine();
+			
+			$viewEngine->render();
+		});
 	}
 }
 ```

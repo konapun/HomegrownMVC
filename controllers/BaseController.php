@@ -10,12 +10,14 @@ include_once('errors/RouteNotDefinedException.php');
 abstract class BaseController {
 	private $context;
 	private $controllerBase;
-	private $callbacks;
+	private $before;
+	private $after;
 	
 	function __construct($context) {
 		$this->context = $context;
 		$this->controllerBase = "";
-		$this->callbacks = array();
+		$this->before = array();
+		$this->after = array();
 	}
 	
 	/*
@@ -28,8 +30,17 @@ abstract class BaseController {
 	 * 
 	 * This can be useful for setting active classes in a template based on a route
 	 */
-	protected function eachRoute($cb) {
-		array_push($this->callbacks, $cb);
+	protected function beforeRoutes($cb) {
+		array_push($this->before, $cb);
+	}
+	
+	/*
+	 * Give a callback to run after invoking a route
+	 *
+	 * This can be useful for displaying views that are common between all routes
+	 */
+	protected function afterRoutes($cb) {
+		array_push($this->after, $cb);
 	}
 	
 	/*
@@ -52,10 +63,13 @@ abstract class BaseController {
 		if (array_key_exists($action, $routes)) {
 			$controllerAction = $routes[$action];
 		
-			foreach ($this->callbacks as $cb) {
+			foreach ($this->before as $cb) {
 				if ($cb($context) === false) break;
 			}
-			return $controllerAction($context);
+			$controllerAction($context);
+			foreach ($ths->after as $cb) {
+				if ($cb($context === false) break;
+			}
 		}
 		else {
 			throw new RouteNotDefinedException("Controller does not define an action for route $action"); // User can throw a 404 or something
