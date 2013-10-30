@@ -64,7 +64,7 @@ abstract class WildcardController extends BaseController {
 	 */
 	private function expandRoutes($url, $routes) {
 		$expandedRoutes = array();
-		$urlFields = explode('/', $url);
+		$urlFields = explode('/', strtok($url, '?'));
 		foreach ($routes as $route => $action) {
 			$fields = explode('/', $route);
 			$fieldIndex = 0;
