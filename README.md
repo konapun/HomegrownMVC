@@ -178,7 +178,9 @@ class TestController extends BaseController {
 ```
 
 ## Working with the stash
-The context's stash is a general-purpose key/value store.
+The context's stash is a general-purpose key/value store. Because the same context is used between
+the route action and the pre/post route hooks, using the stash to store values to be shared between
+these functions is ideal.
 Here is an example of using the stash to store a forward route for a route that requires a login:
 ```php
 class AdminController extends BaseController {
@@ -212,6 +214,25 @@ class AdminController extends BaseController {
 			},
 			'overview' => function($context) {
 				// ...
+			}
+		);
+	}
+}
+```
+and sharing between functions:
+```php
+class ContextExampleController extends BaseController {
+	protected function setupRoutes() {
+		$this->beforeRoutes(function($context) {
+			$context->stash('key', 'val');
+		});
+		$this->afterRoutes(function($context) {
+			echo "After route, still have stashed val " . $context->stash('key');
+		});
+		return array(
+			'/home' => function($context) {
+				echo "Preroute: stashed " . $context->stash('key');
+				// can also stash more stuff here to use in the afterRoutes callback
 			}
 		);
 	}
