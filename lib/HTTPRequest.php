@@ -30,7 +30,7 @@ class HTTPRequest {
 	/*
 	 * Return the value for a given field
 	 */
-	function fieldValue($fieldName) {
+	function getFieldValue($fieldName) {
 		$value = "";
 		if ($this->hasField($fieldName)) {
 			$value = $this->requestInfo[$fieldName];
@@ -40,13 +40,37 @@ class HTTPRequest {
 	}
 	
 	/*
+	 * In some cases, a route may accept two mutually exclusive fields, such as
+	 * 'name' or 'id'. This function simply returns the value for the first
+	 * field encountered which has one. If $mapped is set to true, returns a map
+	 * of the found value with its field as field => field_val. Else, only the
+	 * value is returned
+	 */
+	function getFirstValue($fields, $mapped=false) {
+		foreach ($fields as $field) {
+			$value = $this->getFieldValue($field);
+			if ($value) {
+				if ($mapped) {
+					return array(
+						$field => $value
+					);
+				}
+				
+				return $value;
+			}
+		}
+		
+		return "";
+	}
+	
+	/*
 	 * Return all values for fields as an array ordered the same as the fields
 	 * which were passed in
 	 */
 	function listFieldValues($fields) {
 		$values = array();
 		foreach ($fields as $field) {
-			array_push($values, $this->fieldValue($field));		
+			array_push($values, $this->getFieldValue($field));		
 		}
 
 		return $values;
