@@ -68,7 +68,7 @@ abstract class BaseController {
 			}
 			$controllerAction($context);
 			foreach ($ths->after as $cb) {
-				if ($cb($context === false) break;
+				if ($cb($context) === false) break;
 			}
 		}
 		else {
