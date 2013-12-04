@@ -147,10 +147,11 @@ abstract class SingularModel {
 		
 		if (isset($this->anomalies[$field])) { // custom handling for special cases
 			$convertFn = $this->anomalies[$field];
-			return $convertFn($val);
+			$this->fields[$field] = $convertFn($val);
 		}
-		
-		$this->fields[$field] = $val;
+		else { // value is a primitive (default)
+			$this->fields[$field] = $val;
+		}
 		return true;
 	}
 	
