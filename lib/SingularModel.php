@@ -1,80 +1,147 @@
 <?php
+include_once('errors/BuildException.php');
 
 /*
- * A plural model is one that returns a number of singular models
- *
+ * A singular model is the return type of its plural model queries
+ * 
  * Author: Bremen Braun
  */
-abstract class PluralModel {
+abstract class SingularModel {
+	private $fields;
 	private $dbh;
 	
-	function __construct($dbh) {
-		$this->dbh = $dbh;
-	}
-	
 	/*
-	 * Handles all the similar parts of running a query and casting the results
-	 * to an array of singulars
+	 * Create a singular model either from properties or by querying on a field
 	 */
-	final protected function runQuery($query, $paramHash) {
-		$stmt = $this->dbh->prepare($query);
-		foreach ($paramHash as $pkey => $pval) {
-			$stmt->bindParam($pkey, $pval);
+	final function __construct($dbh, $fields) {
+		$this->dbh = $dbh;
+		$this->fields = array();
+		foreach ($this->listProperties() as $property) {
+			$this->fields[$property] = null;
 		}
 		
-		return $this->castResults($stmt->fetchAll());
-	}
-	
-	/*
-	 * Like `runQuery`, but after preparing the query, runs it once for each
-	 * array in $arrayOfParamHashes
-	 */
-	final protected function runMultiQuery($query, $arrayOfParamHashes) {
-		$stmt = $this->dbh->prepare($query);
-		
-		$singulars = array();
-		$results = array();
-		foreach ($arrayOfParamHashes as $paramHash) {
-			foreach ($paramHash as $pkey => $pval) {
-				$stmt->bindParam($pkey, $pval);
+		if (count($fields) > 1) {
+			$this->constructFromProperties($fields);
+		}
+		else {
+			$fkeys = array_keys($fields);
+			$field = $fkeys[0];
+			$builders = $this->setupBuilders($dbh);
+			if (!isset($builders[$field])) {
+				$keys = array_keys($builders);
+				$keystr = "";
+				foreach ($keys as $key) {
+					if ($keystr) {
+						$keystr .= ", ";
+					}
+					$keystr .= $key;
+				}
+				
+				throw new BuildException("Requires one of the following fields for automated build: $keystr");
 			}
 			
-			$results = array_merge($results, $stmt->fetchAll());
+			$builder = $builders[$field];
+			$found = $builder($fields[$field]);
+			$this->cloneIntoThis($found[0]);
 		}
-		
-		return $this->castResults($results);
 	}
 	
-	final protected function getDatabaseHandle() {
+	final function getDatabaseHandle() {
 		return $this->dbh;
 	}
 	
 	/*
-	 * Cast an array of singulars to a hash type that can be consumed by Smarty
-	 * - ex: $plural::hashify($singulars)
+	 * Generic way of getting a model's field value
 	 */
-	static function hashify($singulars) {
-		$hashedSingulars = array();
-		foreach ($singulars as $singular) {
-			array_push($hashedSingulars, $singular->hashify());
+	function getValue($field) {
+		if (!isset($this->fields[$field])) {
+			throw new InvalidArgumentException("Model has no field '$field'");
 		}
-		return $hashedSingulars;
+		
+		return $this->fields[$field];
 	}
 	
 	/*
-	 * Convert a hash to the type of this model's singular form
+	 * Return a hashed version of this model for easy consumption by the view
+	 * engine
 	 */
-	abstract protected function castToProperType($hash);
+	function hashify() {
+		return $this->fields;
+	}
 	
 	/*
-	 * Cast results of query to their proper type
+	 * This is the function called when the singular model is being constructed
+	 * from its plural. The default behavior is to clone the properties into
+	 * this verbatim, but you can override it if you need.
 	 */
-	private function castResults($results) {
-		$casted = array();
-		foreach ($results as $result) {
-			array_push($casted, $this->castToProperType($result));
+	protected function constructFromProperties($properties) {
+		$nprops = count($properties);
+		$nfields = count($this->fields);
+		
+		$fieldstr = ""; // string of fields used for error reporting
+		foreach ($this->fields as $fkey => $fval) {
+			if ($fieldstr) {
+				$fieldstr .= ' ';
+			}
+			$fieldstr .= $fkey;
 		}
-		return $casted;
+		
+		$errPrefix = "";
+		if ($nprops > $nfields) {
+			$errPrefix = "Too many properties given.";
+		}
+		else if ($nprops < $nfields) {
+			$errPrefix = "Too few properties given.";
+		}
+		if ($errPrefix) {
+			$propstr = "";
+			foreach ($properties as $pkey => $pval) {
+				if ($propstr) {
+					$propstr .= ' ';
+				}	
+				$propstr .= $pkey;
+			}
+			
+			throw new BuildException("$errPrefix Requires: $fieldstr (Got: $propstr)");
+		}
+		
+		foreach ($properties as $pkey => $pval) {
+			if (!$this->setValue($pkey, $pval)) {
+				throw new BuildException("Model has no property '$pkey'. Requires: $fieldstr");
+			}
+		}
+	}
+	
+	/*
+	 * Returns a map of properties to its builder
+	 */
+	abstract protected function setupBuilders($property);
+	
+	/*
+	 * Return an array of all the fields this model has
+	 */
+	abstract protected function listProperties();
+	
+	/*
+	 * Attempt to set the value of a field, returning false if there is no field
+	 * with that key for this model
+	 */
+	private function setValue($field, $val) {
+		if (!array_key_exists($field, $this->fields)) {
+			return false;
+		}
+		
+		$this->fields[$field] = $val;
+		return true;
+	}
+	
+	/*
+	 * Clone a model of the same type into this model
+	 */
+	private function cloneIntoThis($plural) {
+		foreach ($this->fields as $field) {
+			$this->fields[$field] = $plural->getValue($field);
+		}
 	}
 }
 ?>
