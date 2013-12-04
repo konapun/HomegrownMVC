@@ -45,6 +45,10 @@ abstract class PluralModel {
 		return $this->castResults($results);
 	}
 	
+	final protected function getDatabaseHandle() {
+		return $this->dbh;
+	}
+	
 	/*
 	 * Cast an array of singulars to a hash type that can be consumed by Smarty
 	 * - ex: $plural::hashify($singulars)
