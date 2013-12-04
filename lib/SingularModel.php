@@ -8,6 +8,7 @@ include_once('errors/BuildException.php');
  */
 abstract class SingularModel {
 	private $fields;
+	private $anomalies;
 	private $dbh;
 	
 	/*
@@ -16,6 +17,7 @@ abstract class SingularModel {
 	final function __construct($dbh, $fields) {
 		$this->dbh = $dbh;
 		$this->fields = array();
+		$this->anomalies = $this->handlePropertyConstructionAnomalies();
 		foreach ($this->listProperties() as $property) {
 			$this->fields[$property] = null;
 		}
@@ -72,9 +74,11 @@ abstract class SingularModel {
 	/*
 	 * This is the function called when the singular model is being constructed
 	 * from its plural. The default behavior is to clone the properties into
-	 * this verbatim, but you can override it if you need.
+	 * this verbatim. However, if you require special handling of particular
+	 * fields (converting a primitive from the database return to an object),
+	 * you can handle these in `handlePropertyConstructionAnomalies`.
 	 */
-	protected function constructFromProperties($properties) {
+	final protected function constructFromProperties($properties) {
 		$nprops = count($properties);
 		$nfields = count($this->fields);
 		
@@ -123,12 +127,27 @@ abstract class SingularModel {
 	abstract protected function listProperties();
 	
 	/*
+	 * By default, `constructFromProperties` sets the values of its fields by
+	 * primitives obtained through database queries (via a PluralModel). If you
+	 * need to convert it to an object type, define a mapping of the field to
+	 * a function which performs the conversion.
+	 */
+	protected function handlePropertyConstructionAnomalies() {
+		return array();
+	}
+	
+	/*
 	 * Attempt to set the value of a field, returning false if there is no field
 	 * with that key for this model
 	 */
 	private function setValue($field, $val) {
 		if (!array_key_exists($field, $this->fields)) {
 			return false;
+		}
+		
+		if (isset($this->anomalies[$field])) { // custom handling for special cases
+			$convertFn = $this->anomalies[$field];
+			return $convertFn($val);
 		}
 		
 		$this->fields[$field] = $val;
