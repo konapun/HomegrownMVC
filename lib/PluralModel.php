@@ -18,17 +18,31 @@ abstract class PluralModel {
 	 */
 	final protected function runQuery($query, $paramHash) {
 		$stmt = $this->dbh->prepare($query);
-		foreach ($paramHash as $pkey, $pval) {
+		foreach ($paramHash as $pkey => $pval) {
 			$stmt->bindParam($pkey, $pval);
 		}
 		
+		return $this->castResults($stmt->fetchAll());
+	}
+	
+	/*
+	 * Like `runQuery`, but after preparing the query, runs it once for each
+	 * array in $arrayOfParamHashes
+	 */
+	final protected function runMultiQuery($query, $arrayOfParamHashes) {
+		$stmt = $this->dbh->prepare($query);
+		
 		$singulars = array();
-		$results = $stmt->fetchAll();
-		foreach ($results as $result) {
-			array_push($singulars, $this->castToProperType($result));
+		$results = array();
+		foreach ($arrayOfParamHashes as $paramHash) {
+			foreach ($paramHash as $pkey => $pval) {
+				$stmt->bindParam($pkey, $pval);
+			}
+			
+			$results = array_merge($results, $stmt->fetchAll());
 		}
 		
-		return $singulars;
+		return $this->castResults($results);
 	}
 	
 	/*
@@ -46,6 +60,17 @@ abstract class PluralModel {
 	/*
 	 * Convert a hash to the type of this model's singular form
 	 */
-	protected function castToProperType($hash);
+	abstract protected function castToProperType($hash);
+	
+	/*
+	 * Cast results of query to their proper type
+	 */
+	private function castResults($results) {
+		$casted = array();
+		foreach ($results as $result) {
+			array_push($casted, $this->castToProperType($result));
+		}
+		return $casted;
+	}
 }
 ?>

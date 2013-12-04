@@ -22,7 +22,7 @@ abstract class SingularModel {
 			$this->constructFromProperties($fields);
 		}
 		else {
-			$builders = $this->setupBuilders();
+			$builders = $this->setupBuilders($dbh);
 			if (!$builders[$field]) {
 				$keys = array_keys($builders);
 				$keystr = "";
@@ -37,7 +37,8 @@ abstract class SingularModel {
 			}
 			
 			$builder = $builders[$field];
-			$this->cloneIntoThis($builder($dbh));
+			$found = $builder($fields[$field]);
+			$this->cloneIntoThis($found[0]);
 		}
 	}
 	
@@ -59,11 +60,6 @@ abstract class SingularModel {
 	function hashify() {
 		return $this->fields;
 	}
-	
-	/*
-	 * Returns a map of properties to its builder
-	 */
-	protected function setupBuilders($property);
 	
 	/*
 	 * This is the function called when the singular model is being constructed
@@ -101,9 +97,14 @@ abstract class SingularModel {
 	}
 	
 	/*
+	 * Returns a map of properties to its builder
+	 */
+	abstract protected function setupBuilders($property);
+	
+	/*
 	 * Return an array of all the fields this model has
 	 */
-	protected function listProperties();
+	abstract protected function listProperties();
 	
 	/*
 	 * Attempt to set the value of a field, returning false if there is no field
@@ -114,7 +115,7 @@ abstract class SingularModel {
 			return false;
 		}
 		
-		this->fields[$pkey] = $pval;
+		$this->fields[$pkey] = $pval;
 		return true;
 	}
 	
