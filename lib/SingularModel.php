@@ -139,8 +139,8 @@ abstract class SingularModel {
 	 * Clone a model of the same type into this model
 	 */
 	private function cloneIntoThis($plural) {
-		foreach ($this->fields as $field) {
-			$this->fields[$field] = $plural->getValue($field);
+		foreach ($this->fields as $fkey => $fval) {
+			$this->fields[$fkey] = $plural->getValue($fkey);
 		}
 	}
 }
