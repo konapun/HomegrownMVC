@@ -46,6 +46,8 @@ abstract class SingularModel {
 			$found = $builder($fields[$field]);
 			$this->cloneIntoThis($found[0]);
 		}
+		
+		$this->configure();
 	}
 	
 	final function getDatabaseHandle() {
@@ -70,6 +72,11 @@ abstract class SingularModel {
 	function hashify() {
 		return $this->fields;
 	}
+	
+	/*
+	 * Define a function to run after this object is created
+	 */
+	function configure() {}
 	
 	/*
 	 * This is the function called when the singular model is being constructed
