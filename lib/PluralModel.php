@@ -14,22 +14,28 @@ abstract class PluralModel {
 	
 	/*
 	 * Handles all the similar parts of running a query and casting the results
-	 * to an array of singulars
+	 * to an array of singulars. If building intermediate results, you can pass 
+	 * `false` to this method to prevent autocasting to the proper type
 	 */
-	final protected function runQuery($query, $paramHash) {
+	final protected function runQuery($query, $paramHash, $cast=true) {
 		$stmt = $this->dbh->prepare($query);
 		foreach ($paramHash as $pkey => $pval) {
 			$stmt->bindParam($pkey, $pval);
 		}
 		
-		return $this->castResults($stmt->fetchAll());
+		$results = $stmt->fetchAll();
+		if ($cast) {
+			$results = $this->castResults($results);
+		}
+		return $results;
 	}
 	
 	/*
 	 * Like `runQuery`, but after preparing the query, runs it once for each
-	 * array in $arrayOfParamHashes
+	 * array in $arrayOfParamHashes. If building intermediate results, you can
+	 * pass `false` to this method to prevent autocasting to the proper type
 	 */
-	final protected function runMultiQuery($query, $arrayOfParamHashes) {
+	final protected function runMultiQuery($query, $arrayOfParamHashes, $cast=true) {
 		$stmt = $this->dbh->prepare($query);
 		
 		$singulars = array();
@@ -42,7 +48,10 @@ abstract class PluralModel {
 			$results = array_merge($results, $stmt->fetchAll());
 		}
 		
-		return $this->castResults($results);
+		if ($cast) {
+			$results = $this->castResults($results);
+		}
+		return $results;
 	}
 	
 	final protected function getDatabaseHandle() {
