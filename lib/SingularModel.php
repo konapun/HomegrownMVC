@@ -1,5 +1,6 @@
 <?php
 include_once('errors/BuildException.php');
+include_once('errors/ResultNotFoundException.php');
 
 /*
  * A singular model is the return type of its plural model queries
@@ -44,6 +45,9 @@ abstract class SingularModel {
 			
 			$builder = $builders[$field];
 			$found = $builder($fields[$field]);
+			if (!$found) {
+				throw new ResultNotFoundException("Couldn't locate a result for $field '" . $fields[$field] . "'");
+			}
 			$this->cloneIntoThis($found[0]);
 		}
 		
