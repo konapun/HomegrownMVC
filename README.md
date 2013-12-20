@@ -6,6 +6,13 @@ This is a router/controller framework (well, barely even a framework) born out o
 I inherited more manageable. It only defines a router and base controller since the project already had models and views.
 As a result, it should work with any templating system and DBAL.
 
+## Recommended setup
+Although Homegrown is written to be flexible and modular, it is known to work well with the following setup:
+  * **router/controllers**: HomegrownMVC
+  * **database**: [PDO](http://php.net/pdo)
+  * **models**: HomegrownMVC (abstract classes for models in /lib)
+  * **views**: [Smarty](http://www.smarty.net/)
+
 ## Contexts
 A context is just an object that bundles together the HTTP request, view engine, and database handle to be passed
 to a controller. Since the context is an object you instantiate, you can use any class for any of these three parameters.
