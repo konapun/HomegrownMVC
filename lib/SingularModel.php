@@ -80,7 +80,7 @@ abstract class SingularModel {
 	/*
 	 * Define a function to run after this object is created
 	 */
-	function configure() {}
+	protected function configure() {}
 	
 	/*
 	 * This is the function called when the singular model is being constructed
