@@ -9,7 +9,6 @@ class HTTPRequest {
 	private $fields;
 	private $routeName;
 	
-	/* CONSTRUCTOR */
 	function __construct() {
 		$this->requestInfo = $_REQUEST;
 		$this->fields = array_keys($this->requestInfo);
@@ -77,12 +76,17 @@ class HTTPRequest {
 	}
 	
 	/*
-	 * Check that all fields exist
+	 * Check that all fields exist and, optionally, that they all have values
 	 */
-	function validateFields($fields) {
+	function validateFields($fields, $withValues=false) {
 		foreach ($fields as $field) {
-			if (!$this->hasField($field)) {
+			if (!$this->fieldExists($field)) {
 				return false;
+			}
+			if ($withValues) {
+				if (!$this->fieldValue($field)) {
+					return false;
+				}
 			}
 		}
 		
