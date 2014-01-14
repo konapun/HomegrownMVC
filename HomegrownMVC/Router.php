@@ -1,4 +1,6 @@
-<?php 
+<?php
+namespace HomegrownMVC;
+
 /*
  * Manage routes by finding the correct controller
  * 
@@ -40,7 +42,7 @@ class Router {
 				
 				$className = $this->getClassnameFromFile(basename($phpFile));
 				if ($className) {
-					$class = new ReflectionClass($className);
+					$class = new \ReflectionClass($className);
 					if ($class->isInstantiable()) {
 						$this->addController($class->newInstance($context));
 					}
@@ -94,7 +96,7 @@ class Router {
 				$foundRoute = true;
 				break;
 			}
-			catch (Exception $e) {}
+			catch (\Exception $e) {}
 		}
 		
 		return $foundRoute;

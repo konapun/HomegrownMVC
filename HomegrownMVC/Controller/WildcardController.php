@@ -1,4 +1,5 @@
 <?php
+namespace HomegrownMVC\Controller;
 
 /*
  * Allow route variables of the form :var in the route name
@@ -66,13 +67,14 @@ abstract class WildcardController extends BaseController {
 		$expandedRoutes = array();
 		$params = array();
 		$urlFields = explode('/', strtok($url, '?'));
+		$urlFieldCount = count($urlFields);
 		foreach ($routes as $route => $action) {
 			$fields = explode('/', $route);
 			$fieldIndex = 0;
 			
 			$expandedRoute = array();
 			foreach ($fields as $field) {
-				if ($field[0] == $this->wcChar) { // it's a wildcard
+				if (strlen($field) > 0 && $field[0] == $this->wcChar && $fieldIndex < $urlFieldCount) { // it's a wildcard
 					$val = $urlFields[$fieldIndex];
 					
 					if ($val) {

@@ -18,7 +18,7 @@ A context is just an object that bundles together the HTTP request, view engine,
 to a controller. Since the context is an object you instantiate, you can use any class for any of these three parameters.
 The context also holds a key-value stash which you can use to pass things around.
 ```php
-$context = new Context($httpRequest, $dbh, $viewEngine);
+$context = new HomegrownMVC\Context($httpRequest, $dbh, $viewEngine);
 
 // Get properties set in constructor
 $request = $context->getRequest();
@@ -37,8 +37,8 @@ HomegrownMVC uses a router to locate controllers.
  * This could be a snippet from your index.php file
  */
 
-$context = new Context($httpRequest, $dbh, $viewEngine);
-$router = new Router();
+$context = new HomegrownMVC\Context($httpRequest, $dbh, $viewEngine);
+$router = new HomegrownMVC\Router();
 
 // Redirect example.com and example.com/ to example.com/home (without altering the URL)
 $router->redirect('/', '/home');
@@ -81,7 +81,7 @@ Currently, two types of controllers are defined:
 /*
  * Sample controller which is a regular BaseController
  */
-class SearchController extends BaseController {
+class SearchController extends HomegrownMVC\BaseController {
 		protected function setupRoutes() {
 			$this->controllerBase('/search/');
 			
@@ -108,7 +108,7 @@ class SearchController extends BaseController {
  * Sample WildcardController demonstrating the use of wildcards
  * in the routes
  */
-class UserController extends WildcardController {
+class UserController extends HomegrownMVC\WildcardController {
 		protected function setupWildcardRoutes() {
 			$this->setWildcardCharacter(':'); // this is the default character, but you can change it to any single character
 			$this->controllerBase('/user/');
@@ -129,7 +129,7 @@ class UserController extends WildcardController {
 A controller may conditionally reroute from one route to another. You may wish to do this if you have
 implemented a RESTful API but do not want to build results through AJAX.
 ```php
-class RerouteController extends BaseController {
+class RerouteController extends HomegrownMVC\BaseController {
 	protected function setupRoutes() {
 		$that = $this;
 		
@@ -154,7 +154,7 @@ You may specify callbacks to run before a route is invoked using `beforeRoutes`.
 and want to set an active class depending on which nav route is invoked. You can stop the rest of the pre-route hooks from being called by returning
 `false` from the callback
 ```php
-class NavigationController extends BaseController {
+class NavigationController extends HomegrownMVC\BaseController {
 	protected function setupRoutes() {
 		$this->beforeRoutes(function($context) {
 			$view = $context->getViewEngine();
@@ -173,7 +173,7 @@ class NavigationController extends BaseController {
 ### Post-route hooks
 These are just like pre-route hooks but fire after a route is invoked. Just as before, you can return `false` to terminate running the rest of the post-route callbacks
 ```php
-class TestController extends BaseController {
+class TestController extends HomegrownMVC\BaseController {
 	protected function setupRoutes() {
 		$this->afterRoutes(function($context) {
 			$view = $context->getViewEngine();
@@ -190,7 +190,7 @@ the route action and the pre/post route hooks, using the stash to store values t
 these functions is ideal.
 Here is an example of using the stash to store a forward route for a route that requires a login:
 ```php
-class AdminController extends BaseController {
+class AdminController extends HomegrownMVC\BaseController {
 	protected function setupRoutes() {
 		$this->controllerBase('/admin/');
 		
@@ -228,7 +228,7 @@ class AdminController extends BaseController {
 ```
 and sharing between functions:
 ```php
-class ContextExampleController extends BaseController {
+class ContextExampleController extends HomegrownMVC\BaseController {
 	protected function setupRoutes() {
 		$this->beforeRoutes(function($context) {
 			$context->stash('key', 'val');

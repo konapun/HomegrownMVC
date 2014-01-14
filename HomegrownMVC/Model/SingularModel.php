@@ -1,6 +1,8 @@
 <?php
-include_once('errors/BuildException.php');
-include_once('errors/ResultNotFoundException.php');
+namespace HomegrownMVC\Model;
+
+use HomegrownMVC\Error\BuildException as BuildException;
+use HomegrownMVC\Error\ResultNotFoundException as ResultNotFoundException;
 
 /*
  * A singular model is the return type of its plural model queries

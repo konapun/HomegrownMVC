@@ -1,4 +1,6 @@
 <?php
+namespace HomegrownMVC\Request;
+
 /*
  * Sample HTTPRequest to be passed to Homegrown's context
  *

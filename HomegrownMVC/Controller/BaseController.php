@@ -1,6 +1,8 @@
 <?php
-include_once('errors/MalformedUrlException.php');
-include_once('errors/RouteNotDefinedException.php');
+namespace HomegrownMVC\Controller;
+
+use HomegrownMVC\Error\MalformedUrlException as MalformedUrlException;
+use HomegrownMVC\Error\RouteNotDefinedException as RouteNotDefinedException;
 
 /*
  * A simple, lightweight controller
@@ -67,7 +69,7 @@ abstract class BaseController {
 				if ($cb($context) === false) break;
 			}
 			$controllerAction($context);
-			foreach ($ths->after as $cb) {
+			foreach ($this->after as $cb) {
 				if ($cb($context) === false) break;
 			}
 		}

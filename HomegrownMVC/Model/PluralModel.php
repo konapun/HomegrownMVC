@@ -1,4 +1,5 @@
 <?php
+namespace HomegrownMVC\Model;
 
 /*
  * A plural model is one that returns a number of singular models

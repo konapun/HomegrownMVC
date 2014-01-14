@@ -1,4 +1,6 @@
 <?php
+namespace HomegrownMVC;
+
 /*
  * Gather disparate objects to be passed as a single object
  */ 
