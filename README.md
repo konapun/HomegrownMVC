@@ -10,7 +10,7 @@ As a result, it should work with any templating system and DBAL.
 Although Homegrown is written to be flexible and modular, it is known to work well with the following setup:
   * **router/controllers**: HomegrownMVC
   * **database**: [PDO](http://php.net/pdo)
-  * **models**: HomegrownMVC (abstract classes for models in /lib)
+  * **models**: HomegrownMVC
   * **views**: [Smarty](http://www.smarty.net/)
 
 ## Contexts
