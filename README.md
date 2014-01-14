@@ -1,6 +1,9 @@
 # Homegrown(MV)C
 A very small MVC framework. Please see [HomegrownMVC Skeleton](https://github.com/konapun/HomegrownMVC-Skeleton) for a project starting point using the recommended setup below.
 
+### Requirements
+HomegrownMVC makes heavy use of closures and namespaces and therefore requires a PHP version >=5.3.0. Additional requirements will vary depending on your exact setup (database drivers, view engine requirements, etc.).
+
 ### Rationale
 This is a router/controller framework (well, barely even a framework) born out of necessity as I tried to make a legacy project
 I inherited more manageable. It only defines a router and base controller since the project already had models and views.
