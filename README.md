@@ -1,5 +1,5 @@
 # Homegrown(MV)C
-A very small MVC framework minus the M and the V
+A very small MVC framework. Please see [HomegrownMVC Skeleton](https://github.com/konapun/HomegrownMVC-Skeleton) for a project starting point using the recommended setup below.
 
 ### Rationale
 This is a router/controller framework (well, barely even a framework) born out of necessity as I tried to make a legacy project
