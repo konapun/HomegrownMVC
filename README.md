@@ -5,16 +5,17 @@ A very small MVC framework. Please see [HomegrownMVC Skeleton](https://github.co
 HomegrownMVC makes heavy use of closures and namespaces and therefore requires a PHP version >=5.3.0. Additional requirements will vary depending on your exact setup (database drivers, view engine requirements, etc.).
 
 ### Rationale
-This is a router/controller framework (well, barely even a framework) born out of necessity as I tried to make a legacy project
-I inherited more manageable. It only defines a router and base controller since the project already had models and views.
-As a result, it should work with any templating system and DBAL.
+This is a router/controller microframework (with other optional elements) born out of necessity as I tried to make a legacy project
+I inherited more manageable. The router/controller portion has no coupling to anything else (dependency injection is managed through the context),
+and as a result should work with any templating system and DBAL.
 
 ## Recommended setup
 Although Homegrown is written to be flexible and modular, it is known to work well with the following setup:
-  * **router/controllers**: HomegrownMVC
+  * **router/controllers**: HomegrownMVC (read on for documentation for this portion)
   * **database**: [PDO](http://php.net/pdo)
-  * **models**: HomegrownMVC
+  * **models**: [HomegrownMVC](Models.md)
   * **views**: [Smarty](http://www.smarty.net/)
+  * **requests**: [Smarty](Request.md)
 
 ## Contexts
 A context is just an object that bundles together the HTTP request, view engine, and database handle to be passed
