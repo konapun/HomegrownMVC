@@ -15,7 +15,7 @@ Although Homegrown is written to be flexible and modular, it is known to work we
   * **database**: [PDO](http://php.net/pdo)
   * **models**: [HomegrownMVC](Models.md)
   * **views**: [Smarty](http://www.smarty.net/)
-  * **requests**: [Smarty](Request.md)
+  * **requests**: [HomegrownMVC](Request.md)
 
 ## Contexts
 A context is just an object that bundles together the HTTP request, view engine, and database handle to be passed
