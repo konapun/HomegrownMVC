@@ -85,7 +85,7 @@ Currently, two types of controllers are defined:
 /*
  * Sample controller which is a regular BaseController
  */
-class SearchController extends HomegrownMVC\BaseController {
+class SearchController extends HomegrownMVC\Controller\BaseController {
 		protected function setupRoutes() {
 			$this->controllerBase('/search/');
 			
@@ -112,7 +112,7 @@ class SearchController extends HomegrownMVC\BaseController {
  * Sample WildcardController demonstrating the use of wildcards
  * in the routes
  */
-class UserController extends HomegrownMVC\WildcardController {
+class UserController extends HomegrownMVC\Controller\WildcardController {
 		protected function setupWildcardRoutes() {
 			$this->setWildcardCharacter(':'); // this is the default character, but you can change it to any single character
 			$this->controllerBase('/user/');
@@ -133,7 +133,7 @@ class UserController extends HomegrownMVC\WildcardController {
 A controller may conditionally reroute from one route to another. You may wish to do this if you have
 implemented a RESTful API but do not want to build results through AJAX.
 ```php
-class RerouteController extends HomegrownMVC\BaseController {
+class RerouteController extends HomegrownMVC\Controller\BaseController {
 	protected function setupRoutes() {
 		$that = $this;
 		
@@ -158,7 +158,7 @@ You may specify callbacks to run before a route is invoked using `beforeRoutes`.
 and want to set an active class depending on which nav route is invoked. You can stop the rest of the pre-route hooks from being called by returning
 `false` from the callback
 ```php
-class NavigationController extends HomegrownMVC\BaseController {
+class NavigationController extends HomegrownMVC\Controller\BaseController {
 	protected function setupRoutes() {
 		$this->beforeRoutes(function($context) {
 			$view = $context->getViewEngine();
@@ -177,7 +177,7 @@ class NavigationController extends HomegrownMVC\BaseController {
 ### Post-route hooks
 These are just like pre-route hooks but fire after a route is invoked. Just as before, you can return `false` to terminate running the rest of the post-route callbacks
 ```php
-class TestController extends HomegrownMVC\BaseController {
+class TestController extends HomegrownMVC\Controller\BaseController {
 	protected function setupRoutes() {
 		$this->afterRoutes(function($context) {
 			$view = $context->getViewEngine();
@@ -194,7 +194,7 @@ the route action and the pre/post route hooks, using the stash to store values t
 these functions is ideal.
 Here is an example of using the stash to store a forward route for a route that requires a login:
 ```php
-class AdminController extends HomegrownMVC\BaseController {
+class AdminController extends HomegrownMVC\Controller\BaseController {
 	protected function setupRoutes() {
 		$this->controllerBase('/admin/');
 		
@@ -232,7 +232,7 @@ class AdminController extends HomegrownMVC\BaseController {
 ```
 and sharing between functions:
 ```php
-class ContextExampleController extends HomegrownMVC\BaseController {
+class ContextExampleController extends HomegrownMVC\Controller\BaseController {
 	protected function setupRoutes() {
 		$this->beforeRoutes(function($context) {
 			$context->stash('key', 'val');
