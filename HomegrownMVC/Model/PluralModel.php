@@ -28,7 +28,7 @@ abstract class PluralModel {
 		if ($cast) {
 			$results = $this->castResults($results);
 		}
-		return $results;
+		return $this->filterResults($results);
 	}
 	
 	/*
@@ -75,6 +75,15 @@ abstract class PluralModel {
 	 * Convert a hash to the type of this model's singular form
 	 */
 	abstract protected function castToProperType($hash);
+	
+	/*
+	 * Define a function to run after results are prepared from the query and
+	 * subsequently casted. This is useful if you need to throw anything away
+	 * after casting
+	 */
+	protected function filterResults($results) {
+		return $results;
+	}
 	
 	/*
 	 * Cast results of query to their proper type
