@@ -29,6 +29,15 @@ class HTTPRequest {
 	}
 	
 	/*
+	 * Setting a field's value might be useful when sharing data between routes
+	 * within a controller with forwarding
+	 */
+	function setFieldValue($fieldName, $fieldValue) {
+		$this->requestInfo[$fieldName] = $fieldValue;
+		array_push($this->fields, $fieldName);
+	}
+	
+	/*
 	 * Return the value for a given field
 	 */
 	function getFieldValue($fieldName) {
