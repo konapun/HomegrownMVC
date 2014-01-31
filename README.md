@@ -249,3 +249,6 @@ class ContextExampleController extends HomegrownMVC\Controller\BaseController {
 	}
 }
 ```
+
+You can also share data between routes using `$req->setFieldValue('field', 'value')` if you're
+using HomegrownMVC\Request\HTTPRequest for your request provider.
