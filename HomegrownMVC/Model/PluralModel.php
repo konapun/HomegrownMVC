@@ -72,6 +72,17 @@ abstract class PluralModel {
 	}
 	
 	/*
+	 * Loop through singulars, creating an array of a single property
+	 */
+	static function arrayOnProperty($singulars, $property) {
+		$array = array();
+		foreach ($singulars as $singular) {
+			array_push($array, $singular->getValue($property));
+		}
+		return $array;
+	}
+	
+	/*
 	 * Convert a hash to the type of this model's singular form
 	 */
 	abstract protected function castToProperType($hash);
