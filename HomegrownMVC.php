@@ -1,6 +1,7 @@
 <?php
 /*
- * Import everything needed for a HomegrownMVC project
+ * Import everything needed for a HomegrownMVC project so they're available via
+ * `use` statements
  *
  * Author: Bremen Braun
  */
@@ -23,7 +24,4 @@ include_once($errorBase . 'BuildException.php');
 include_once($errorBase . 'MalformedUrlException.php');
 include_once($errorBase . 'ResultNotFoundException.php');
 include_once($errorBase . 'RouteNotDefinedException.php');
-
-include_once('lib/Smarty.class.php');
-include_once('lib/DatabaseHandler/DatabaseHandler.php');
 ?>
