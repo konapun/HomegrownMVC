@@ -1,6 +1,7 @@
 <?php
 namespace HomegrownMVC\Model;
 
+use HomegrownMVC\Behaviors\Hashable;
 use HomegrownMVC\Error\BuildException as BuildException;
 use HomegrownMVC\Error\ResultNotFoundException as ResultNotFoundException;
 
@@ -9,7 +10,7 @@ use HomegrownMVC\Error\ResultNotFoundException as ResultNotFoundException;
  * 
  * Author: Bremen Braun
  */
-abstract class SingularModel {
+abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 	private $fields;
 	private $anomalies;
 	private $dbh;
