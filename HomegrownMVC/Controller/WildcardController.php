@@ -71,6 +71,7 @@ abstract class WildcardController extends BaseController {
 			$fields = explode('/', $route);
 			$fieldIndex = 0;
 			$params = array(); // wildcard params
+			$paramsSatisfied = true;
 			
 			$expandedRoute = array();
 			foreach ($fields as $field) {
@@ -81,16 +82,22 @@ abstract class WildcardController extends BaseController {
 						$params[substr($field, 1)] = $val;
 						$field = $val;
 					}
+					else {
+						$paramsSatisfied = false;
+						break;
+					}
 				}
 				
 				array_push($expandedRoute, $field);
 				$fieldIndex++;
 			}
 			
-			$expandedRoute = implode('/', $expandedRoute); // rejoin the route string
-			$expandedRoutes[$expandedRoute] = function($context) use (&$params, $action) { // curry to match the signature that parent::invokeRoute understands
-				$action($context, $params);
-			};
+			if ($paramsSatisfied) { // only add route if all params have values
+				$expandedRoute = implode('/', $expandedRoute); // rejoin the route string
+				$expandedRoutes[$expandedRoute] = function($context) use (&$params, $action) { // curry to match the signature that parent::invokeRoute understands
+					$action($context, $params);
+				};
+			}
 		}
 		
 		return $expandedRoutes;
