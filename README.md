@@ -152,6 +152,16 @@ class RerouteController extends HomegrownMVC\Controller\BaseController {
 	}
 }
 ```
+### Controller hooks workflow
+When a route is matched, the following actions will be taken
+  1. All `beforeRoute` actions will be executed in the order they are defined
+  2. The matching route's action will be executed
+  3. All `afterRoute` actions will be executed in the order they are defined
+
+You may find it useful to use `beforeRoute` hooks for error checks, or in the case of an admin controller, checking to make sure the user is logged
+in.
+
+**If you want to terminate the workflow prematurely, simply return `false` from any callback.**
 
 ### Pre-route hooks
 You may specify callbacks to run before a route is invoked using `beforeRoutes`. This is useful when, for example, you have a navigation controller
