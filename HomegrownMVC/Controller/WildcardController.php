@@ -66,38 +66,30 @@ abstract class WildcardController extends BaseController {
 	private function expandRoutes($url, $routes) {
 		$expandedRoutes = array();
 		$urlFields = explode('/', strtok($url, '?'));
-		$urlFieldCount = count($urlFields) + 1;
+		$urlFieldCount = count($urlFields);
 		foreach ($routes as $route => $action) {
 			$fields = explode('/', $route);
 			$fieldIndex = 0;
 			$params = array(); // wildcard params
-			$paramsSatisfied = true;
+			if (count($fields) !== $urlFieldCount) continue;
 			
 			$expandedRoute = array();
 			foreach ($fields as $field) {
-				if (strlen($field) > 0 && $field[0] == $this->wcChar && $fieldIndex < $urlFieldCount) { // it's a wildcard
+				if (strlen($field) > 0 && $field[0] == $this->wcChar) { // it's a wildcard
 					$val = $urlFields[$fieldIndex];
 					
-					if ($val) {
-						$params[substr($field, 1)] = $val;
-						$field = $val;
-					}
-					else {
-						$paramsSatisfied = false;
-						break;
-					}
+					$params[substr($field, 1)] = $val;
+					$field = $val;
 				}
 				
 				array_push($expandedRoute, $field);
 				$fieldIndex++;
 			}
 			
-			if ($paramsSatisfied) { // only add route if all params have values
-				$expandedRoute = implode('/', $expandedRoute); // rejoin the route string
-				$expandedRoutes[$expandedRoute] = function($context) use (&$params, $action) { // curry to match the signature that parent::invokeRoute understands
-					$action($context, $params);
-				};
-			}
+			$expandedRoute = implode('/', $expandedRoute); // rejoin the route string
+			$expandedRoutes[$expandedRoute] = function($context) use ($params, $action) { // curry to match the signature that parent::invokeRoute understands
+				$action($context, $params);
+			};
 		}
 		
 		return $expandedRoutes;
