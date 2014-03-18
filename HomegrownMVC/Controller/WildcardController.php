@@ -78,7 +78,7 @@ abstract class WildcardController extends BaseController {
 				if (strlen($field) > 0 && $field[0] == $this->wcChar) { // it's a wildcard
 					$val = $urlFields[$fieldIndex];
 					
-					$params[substr($field, 1)] = $val;
+					$params[substr($field, 1)] = urldecode($val);
 					$field = $val;
 				}
 				
