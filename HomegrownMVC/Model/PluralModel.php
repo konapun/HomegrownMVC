@@ -8,15 +8,29 @@ namespace HomegrownMVC\Model;
  */
 abstract class PluralModel {
 	private $dbh;
+	private $resultsToUpper;
 	
-	function __construct($dbh) {
+	function __construct($dbh, $resultsToUpper=false) {
 		$this->dbh = $dbh;
+		$this->resultsToUpper = $resultsToUpper;
+	}
+	
+	/*
+	 * Setting uppercase to true means the associative array which is the result
+	 * of runQuery will have its keys in all uppercase. This is a useful feature
+	 * when wanting to switch between a case-insensitive database to a
+	 * case-sensitive one without having to modify your queries.
+	 */
+	final function setResultsUppercase($uppercase=true) {
+		$this->resultsToUpper = $uppercase;
 	}
 	
 	/*
 	 * Handles all the similar parts of running a query and casting the results
 	 * to an array of singulars. If building intermediate results, you can pass 
-	 * `false` to this method to prevent autocasting to the proper type
+	 * `false` to this method to prevent autocasting to the proper type. If
+	 * resultsToUpper is set to `true`, named results will be returned as
+	 * uppercase.
 	 */
 	final protected function runQuery($query, $paramHash, $cast=true) {
 		$stmt = $this->dbh->prepare($query);
@@ -25,6 +39,17 @@ abstract class PluralModel {
 		}
 		
 		$results = $stmt->fetchAll();
+		if ($this->resultsToUpper) { // Ensure all result array keys are uppercase so queries can be used across adapters more easily
+			$resultsUpper = array();
+			foreach ($results as $result) {
+				$resultUpper = array();
+				foreach ($result as $key => $value) {
+					$resultUpper[strtoupper($key)] = $value;
+				}
+				array_push($resultsUpper, $resultUpper);
+			}
+			$results = $resultsUpper;
+		}
 		if ($cast) {
 			$results = $this->castResults($results);
 		}
