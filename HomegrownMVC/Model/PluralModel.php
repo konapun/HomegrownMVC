@@ -8,7 +8,7 @@ namespace HomegrownMVC\Model;
  */
 abstract class PluralModel {
 	private $dbh;
-	private $resultsToUpper;
+	private $resultsToUpper = false;
 	
 	function __construct($dbh, $resultsToUpper=false) {
 		$this->dbh = $dbh;
@@ -39,16 +39,8 @@ abstract class PluralModel {
 		}
 		
 		$results = $stmt->fetchAll();
-		if ($this->resultsToUpper) { // Ensure all result array keys are uppercase so queries can be used across adapters more easily
-			$resultsUpper = array();
-			foreach ($results as $result) {
-				$resultUpper = array();
-				foreach ($result as $key => $value) {
-					$resultUpper[strtoupper($key)] = $value;
-				}
-				array_push($resultsUpper, $resultUpper);
-			}
-			$results = $resultsUpper;
+		if ($this->resultsToUpper) {
+			$results = $this->getResultsAsUppercase($results);
 		}
 		if ($cast) {
 			$results = $this->castResults($results);
@@ -71,7 +63,11 @@ abstract class PluralModel {
 				$stmt->bindParam($pkey, $pval);
 			}
 			
-			$results = array_merge($results, $stmt->fetchAll());
+			$resultSet = $stmt->fetchAll();
+			if ($this->resultsToUpper) {
+				$resultSet = $this->getResultsAsUppercase($resultSet);
+			}
+			$results = array_merge($results, $resultSet);
 		}
 		
 		if ($cast) {
@@ -130,6 +126,23 @@ abstract class PluralModel {
 			array_push($casted, $this->castToProperType($result));
 		}
 		return $casted;
+	}
+	
+	/*
+	 * Ensure all result array keys are uppercase so queries can be used across
+	 * adapters more easily
+	 */
+	private function getResultsAsUppercase($results) {
+		$resultsUpper = array();
+		foreach ($results as $result) {
+			$resultUpper = array();
+			foreach ($result as $key => $value) {
+				$resultUpper[strtoupper($key)] = $value;
+			}
+			array_push($resultsUpper, $resultUpper);
+		}
+		
+		return $resultsUpper;
 	}
 }
 ?>
