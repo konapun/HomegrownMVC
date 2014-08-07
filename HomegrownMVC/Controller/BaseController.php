@@ -62,7 +62,7 @@ abstract class BaseController {
 		if ($this->controllerBase && (($basepos = strpos($action, $this->controllerBase)) !== false)) {
 			$action = substr($action, $basepos + strlen($this->controllerBase));
 		}
-		if (array_key_exists($action, $routes)) {
+		if ($action && array_key_exists($action, $routes)) {
 			$controllerAction = $routes[$action];
 			
 			$workflow = array_merge($this->before, array_merge(array($controllerAction), $this->after)); // run beforeRoutes, route action, and afterRoutes, halting prematurely if any function returns false
