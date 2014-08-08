@@ -18,7 +18,7 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 	/*
 	 * Create a singular model either from properties or by querying on a field
 	 */
-	final function __construct($dbh, $fields=array()) {
+	final function __construct($dbh, $fields) {
 		$this->dbh = $dbh;
 		$this->fields = array();
 		$this->anomalies = $this->handlePropertyConstructionAnomalies();
