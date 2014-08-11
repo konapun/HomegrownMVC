@@ -1,28 +1,34 @@
 <?php
-namespace HomegrownMVC\Model\Fixture;
+namespace HomegrownMVC\Model;
 
 /*
- * Similar to HomegrownMVC\Model\PluralModel, but made especially for handling
- * collections of data without a database
+ * A model which is instantiated with data without needing a database
  *
  * Author: Bremen Braun
  */
-abstract class PluralModel {
+abstract class FixtureModel {
   private static $data;
-  private $singularClass;
-
-  function __construct($singularClass="") {
-    if (!$singularClass) $singularClass = $this->inferSingularClassName();
-    $this->singularClass = $singularClass;
+  private $dbh;
+  private $singularClassName;
+  
+  /*
+   * Instantiate all data for this model, passing each SingularModel a database
+   * handle $dbh (or null) and the name of the singular class to be created. If
+   * no singular class name is given, this class will try to infer it by finding
+   * the singular form of this class name
+   */
+  function __construct($dbh=null, $singularClassName="") {
+    if (!$singularClassName) $singularClassName = $this->inferSingularClassName();
+    $this->singularClassName = $singularClassName;
     self::$data = $this->instantiateData($this->setupData());
   }
-
+  
   /*
    * Return an array of hashes containing data to use in creating the singular
    * version of this model
    */
   abstract protected function setupData();
-
+  
   /*
    * Return all data contained within this fixture as an array of instantiated
    * objects
@@ -30,19 +36,20 @@ abstract class PluralModel {
   final function getAll() {
     return self::$data;
   }
-
+  
   /*
    * Convenience method for filtering the data using a callback that takes an
    * object from the collection and returns true or false depending on whether
    * or not to keep the object in the filtered collection
    */
-  final function filter($callback) {
+  final function find($callback) {
     $found = array();
     foreach (self::$data as $object) {
       if ($callback($object)) {
         array_push($found, $object);
       }
     }
+    
     return $found;
   }
 
@@ -55,23 +62,22 @@ abstract class PluralModel {
     foreach ($singulars as $singular) {
       array_push($hashedSingulars, $singular->hashify());
     }
+    
     return $hashedSingulars;
   }
-
+  
   private function inferSingularClassName() {
-    $pluralName = get_class();
-    echo "Inferring singular classname from $pluralName";
-    // TODO
-    return $pluralName;
+    die("This functionality is not yet implemented. For now, pass the name of the singular class to create manually");
   }
-
+  
   private function instantiateData($arrayOfHashes) {
     $objects = array();
-    $class = $this->singularClass;
+    $dbh = $this->dbh;
+    $class = $this->singularClassName;
     foreach ($arrayOfHashes as $hash) {
-      array_push($objects, new $class($hash))
+      array_push($objects, new $class($dbh, $hash));
     }
-
+    
     return $objects;
   }
 }

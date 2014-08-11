@@ -19,6 +19,7 @@ include_once($behaviorsBase . 'Hashable.php');
 include_once($controllerBase . 'BaseController.php');
 include_once($controllerBase . 'WildcardController.php');
 include_once($modelBase . 'PluralModel.php');
+include_once($modelBase . 'FixtureModel.php');
 include_once($modelBase . 'SingularModel.php');
 include_once($errorBase . 'BuildException.php');
 include_once($errorBase . 'MalformedUrlException.php');
