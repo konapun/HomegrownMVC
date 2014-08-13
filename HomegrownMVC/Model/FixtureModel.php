@@ -7,7 +7,7 @@ namespace HomegrownMVC\Model;
  * Author: Bremen Braun
  */
 abstract class FixtureModel {
-  private static $data;
+  private $data;
   private $dbh;
   private $singularClassName;
   
@@ -20,7 +20,7 @@ abstract class FixtureModel {
   function __construct($dbh=null, $singularClassName="") {
     if (!$singularClassName) $singularClassName = $this->inferSingularClassName();
     $this->singularClassName = $singularClassName;
-    self::$data = $this->instantiateData($this->setupData());
+    $this->data = $this->instantiateData($this->setupData());
   }
   
   /*
@@ -34,7 +34,7 @@ abstract class FixtureModel {
    * objects
    */
   final function getAll() {
-    return self::$data;
+    return $this->data;
   }
   
   /*
@@ -44,7 +44,7 @@ abstract class FixtureModel {
    */
   final function find($callback) {
     $found = array();
-    foreach (self::$data as $object) {
+    foreach ($this->data as $object) {
       if ($callback($object)) {
         array_push($found, $object);
       }
