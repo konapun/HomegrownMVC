@@ -33,8 +33,11 @@ abstract class FixtureModel {
    * Return all data contained within this fixture as an array of instantiated
    * objects
    */
-  final function getAll() {
-    return $this->data;
+  final function getAll($sortFn=null) {
+    $data = $this->data;
+    if ($sortFn) usort($data, $sortFn);
+    
+    return $data;
   }
   
   /*
