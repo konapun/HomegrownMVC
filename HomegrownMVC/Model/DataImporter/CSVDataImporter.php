@@ -63,7 +63,6 @@ class CSVDataImporter implements IDataImporter {
         continue;
       }
       else if (count($columns) != $fieldCount) {
-        var_dump($columns);
         throw new CSVException("Unexpected number of columns in row $rowNumber (got " . count($columns) . ", expected $fieldCount)");
       }
       
