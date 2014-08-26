@@ -52,10 +52,12 @@ class CSVDataImporter implements IDataImporter {
     $enclosure = $this->enclosure;
     $escape = $this->escape;
     
-    $rowNumber = 1;
+    $rowNumber = 0;
     $fieldCount = count($fields);
     $data = array();
     foreach ($lines as $line) {
+      $rowNumber++;
+      
       $columns = str_getcsv($line, $delimiter, $enclosure, $escape);
       if ($fieldCount == 0) { // first time through, get fields from file
         $fields = $columns;
@@ -73,7 +75,6 @@ class CSVDataImporter implements IDataImporter {
         $columnIndex++;
       }
       array_push($data, $namedHash);
-      $rowNumber++;
     }
     
     return $data;
