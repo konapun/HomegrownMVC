@@ -21,6 +21,7 @@ abstract class FixtureModel {
     if (!$singularClassName) $singularClassName = $this->inferSingularClassName();
     $this->singularClassName = $singularClassName;
     $this->data = $this->instantiateData($this->setupData());
+    $this->dbh = $dbh;
   }
   
   /*
@@ -28,6 +29,13 @@ abstract class FixtureModel {
    * version of this model
    */
   abstract protected function setupData();
+  
+  /*
+   * Get the database handle used to create this object
+   */
+  final function getDatabaseHandle() {
+    return $this->dbh;
+  }
   
   /*
    * Return all data contained within this fixture as an array of instantiated
