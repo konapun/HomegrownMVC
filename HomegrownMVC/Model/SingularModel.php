@@ -45,7 +45,7 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 	 */
 	function getValue($field) {
 		if (!isset($this->fields[$field])) {
-			throw new \InvalidArgumentException("Model has no field '$field'");
+			throw new \InvalidArgumentException("Model " . get_class($this) . " has no field '$field'");
 		}
 		
 		return $this->fields[$field];
