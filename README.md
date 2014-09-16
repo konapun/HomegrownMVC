@@ -1,3 +1,4 @@
+![HomegrownMVC](doc/logo.png)
 # Homegrown(MV)C
 A very small MVC framework. Please see [HomegrownMVC Skeleton](https://github.com/konapun/HomegrownMVC-Skeleton) for a project starting point using the recommended setup below.
 
