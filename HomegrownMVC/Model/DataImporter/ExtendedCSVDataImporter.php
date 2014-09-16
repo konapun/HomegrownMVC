@@ -13,6 +13,11 @@ class ExtendedCSVDataImporter extends CSVImporter {
   private $globalImportPath = "";
   private $importPaths = array();
   
+  /*
+   * Set the prefix that will be used to identify a column value as data which
+   * is to be loaded from an external file. If this is not set manually, the
+   * default prefix is "file:"
+   */
   function setPrefix($prefix) {
     $this->prefix = $prefix;
   }
@@ -29,7 +34,7 @@ class ExtendedCSVDataImporter extends CSVImporter {
   function setFilePath($path, $columnName="") {
     $lastChar = substr($path, -1);
     
-    if ($lastChar != DIRECTORY_SEPARATOR) $path .= DIRECTORY_SEPARATOR; // automatically add directory separator if not present
+    if ($lastChar != DIRECTORY_SEPARATOR) $path .= DIRECTORY_SEPARATOR;
     if ($columnName) {
       $this->importPaths[$columnName] = $path;
     }
@@ -44,7 +49,6 @@ class ExtendedCSVDataImporter extends CSVImporter {
    */
   function importData() {
     $rows = parent::importData();
-    $importPaths = $this->importPaths;
     
     $extendedRows = array();
     $prefix = $this->getPrefix();
@@ -69,6 +73,11 @@ class ExtendedCSVDataImporter extends CSVImporter {
     return $extendedRows;
   }
   
+  /*
+   * Get the actual path for the file, first looking for an override on the
+   * specific import path for the column and falling back to the global import
+   * path if no specific path exists
+   */
   private function getFullPath($column, $path) {
     if (isset($this->importPaths[$column])) {
       return $this->importPaths[$column] . $path;
