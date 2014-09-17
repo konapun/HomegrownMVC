@@ -41,10 +41,16 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 	}
 	
 	/*
+	 * Return whether or not a field is set for this model
+	 */
+	function hasValue($field) {
+		return isset($this->fields[$field]);
+	}
+	/*
 	 * Generic way of getting a model's field value
 	 */
 	function getValue($field) {
-		if (!isset($this->fields[$field])) {
+		if (!$this->hasValue($field)) {
 			throw new \InvalidArgumentException("Model " . get_class($this) . " has no field '$field'");
 		}
 		
