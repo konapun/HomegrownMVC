@@ -3,6 +3,7 @@ namespace HomegrownMVC\Model\DataImporter;
 
 use HomegrownMVC\Model\DataImporter\IDataImporter as IDataImporter;
 use HomegrownMVC\Error\CSVFormatException as CSVException;
+use HomegrownMVC\Error\IOException as IOException;
 
 /*
  * Import data from a CSV file
@@ -46,7 +47,11 @@ class CSVDataImporter implements IDataImporter {
   }
   
   function importData() {
-    $lines = file($this->file, FILE_IGNORE_NEW_LINES);
+    $lines = @file($this->file, FILE_IGNORE_NEW_LINES);
+    if ($lines === false) {
+      throw new IOException("Can't open file " . $this->file . " for reading");
+    }
+    
     $fields = $this->fields;
     $delimiter = $this->delimiter;
     $enclosure = $this->enclosure;
