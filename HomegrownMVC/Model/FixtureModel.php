@@ -12,16 +12,40 @@ abstract class FixtureModel {
   private $singularClassName;
   
   /*
+   * Instantiate data collection either by data returned via `setupData` or by
+   * passing an array of SingularModels as the second argument 
+   */
+  function __construct($dbh=null, $singularClassName="") {
+    if (is_array($singularClassName)) {
+      $this->instantiateFromData($singularClassName);
+    }
+    else {
+      $this->instantiateByClassName($singularClassName);
+    }
+    
+    $this->dbh = $dbh;
+  }
+  
+  /*
+   * Instantiate by manually passing data. This is useful for chained filters
+   * (etc. a `find` result is wrapped in a new FixtureModel instance so `find`
+   * can be called subsequently on the new collection
+   )
+   */
+  private function instantiateFromData($data) {
+    $this->data = $data;
+  }
+  
+  /*
    * Instantiate all data for this model, passing each SingularModel a database
    * handle $dbh (or null) and the name of the singular class to be created. If
    * no singular class name is given, this class will try to infer it by finding
    * the singular form of this class name
    */
-  function __construct($dbh=null, $singularClassName="") {
+  private function instantiateByClassName($singularClassName) {
     if (!$singularClassName) $singularClassName = $this->inferSingularClassName();
     $this->singularClassName = $singularClassName;
     $this->data = $this->instantiateData($this->setupData());
-    $this->dbh = $dbh;
   }
   
   /*
