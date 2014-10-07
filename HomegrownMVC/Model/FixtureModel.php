@@ -27,28 +27,6 @@ abstract class FixtureModel {
   }
   
   /*
-   * Instantiate by manually passing data. This is useful for chained filters
-   * (etc. a `find` result is wrapped in a new FixtureModel instance so `find`
-   * can be called subsequently on the new collection
-   )
-   */
-  private function instantiateFromData($data) {
-    $this->data = $data;
-  }
-  
-  /*
-   * Instantiate all data for this model, passing each SingularModel a database
-   * handle $dbh (or null) and the name of the singular class to be created. If
-   * no singular class name is given, this class will try to infer it by finding
-   * the singular form of this class name
-   */
-  private function instantiateByClassName($singularClassName) {
-    if (!$singularClassName) $singularClassName = $this->inferSingularClassName();
-    $this->singularClassName = $singularClassName;
-    $this->data = $this->instantiateData($this->setupData());
-  }
-  
-  /*
    * Return an array of hashes containing data to use in creating the singular
    * version of this model
    */
@@ -99,6 +77,28 @@ abstract class FixtureModel {
     }
     
     return $hashedSingulars;
+  }
+  
+  /*
+   * Instantiate by manually passing data. This is useful for chained filters
+   * (etc. a `find` result is wrapped in a new FixtureModel instance so `find`
+   * can be called subsequently on the new collection
+   )
+   */
+  private function instantiateFromData($data) {
+    $this->data = $data;
+  }
+  
+  /*
+   * Instantiate all data for this model, passing each SingularModel a database
+   * handle $dbh (or null) and the name of the singular class to be created. If
+   * no singular class name is given, this class will try to infer it by finding
+   * the singular form of this class name
+   */
+  private function instantiateByClassName($singularClassName) {
+    if (!$singularClassName) $singularClassName = $this->inferSingularClassName();
+    $this->singularClassName = $singularClassName;
+    $this->data = $this->instantiateData($this->setupData());
   }
   
   private function inferSingularClassName() {
