@@ -31,6 +31,7 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
       }
 		}
 
+    $fields = $this->giveDefaults($fields);
 		if (count($fields) > 1) {
 			$this->constructFromProperties($fields);
 		}
@@ -78,7 +79,7 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 	/*
 	 * Returns a map of properties to its builder
 	 */
-	abstract protected function setupBuilders($property);
+	abstract protected function setupBuilders($dbh);
 
 	/*
 	 * Return an array of all the fields this model has. You can optionally
@@ -211,6 +212,16 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 		}
 	}
 
+  private function giveDefaults($fields) {
+    foreach ($this->fields as $fieldKey => $fieldVal) {
+      if (!array_key_exists($fieldKey, $fields)) {
+        $fields[$fieldKey] = $fieldVal;
+      }
+    }
+
+    return $fields;
+  }
+
 	/*
 	 * Clone a model of the same type into this model
 	 */
@@ -221,3 +232,4 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 	}
 }
 ?>
+
