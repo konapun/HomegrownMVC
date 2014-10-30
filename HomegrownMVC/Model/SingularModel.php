@@ -79,7 +79,9 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 	/*
 	 * Returns a map of properties to its builder
 	 */
-	abstract protected function setupBuilders($dbh);
+	protected function setupBuilders($dbh) {
+		return array();
+	}
 
 	/*
 	 * Return an array of all the fields this model has. You can optionally
