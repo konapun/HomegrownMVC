@@ -32,10 +32,17 @@ abstract class PluralModel {
 	 * resultsToUpper is set to `true`, named results will be returned as
 	 * uppercase.
 	 */
-	final protected function runQuery($query, $paramHash, $cast=true) {
-		$stmt = $this->dbh->prepare($query);
-		foreach ($paramHash as $pkey => $pval) {
-			$stmt->bindParam($pkey, $pval);
+	final protected function runQuery($query, $paramHash=array(), $cast=true) {
+		$stmt = null;
+		$dbh = $this->dbh;
+		if (count($paramHash) == 0) {
+			$stmt = $dbh->query($query);
+		}
+		else {
+			$stmt = $dbh->prepare($query);
+			foreach ($paramHash as $pkey => $pval) {
+				$stmt->bindParam($pkey, $pval);
+			}
 		}
 		
 		$results = $stmt->fetchAll();
