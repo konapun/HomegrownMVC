@@ -27,6 +27,7 @@ include_once($modelBase . 'SingularModel.php');
 include_once($modelBase . 'FixtureModel.php');
 include_once($errorBase . 'BuildException.php');
 include_once($errorBase . 'MalformedUrlException.php');
+include_once($errorBase . 'PDOException.php');
 include_once($errorBase . 'ResultNotFoundException.php');
 include_once($errorBase . 'RouteNotDefinedException.php');
 include_once($errorBase . 'CSVFormatException.php');
