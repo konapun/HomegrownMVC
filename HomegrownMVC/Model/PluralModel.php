@@ -46,6 +46,7 @@ abstract class PluralModel {
   			foreach ($paramHash as $pkey => $pval) {
   				$stmt->bindParam($pkey, $pval);
   			}
+        $stmt->execute();
       }
 		}
 		if ($stmt === false) {
@@ -77,7 +78,8 @@ abstract class PluralModel {
 			foreach ($paramHash as $pkey => $pval) {
 				$stmt->bindParam($pkey, $pval);
 			}
-
+      $stmt->execute();
+      
 			$resultSet = $stmt->fetchAll();
 			if ($this->resultsToUpper) {
 				$resultSet = $this->getResultsAsUppercase($resultSet);
