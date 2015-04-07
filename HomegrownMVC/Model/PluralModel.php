@@ -42,18 +42,18 @@ abstract class PluralModel {
 		}
 		else {
 			$stmt = $dbh->prepare($query);
-      if ($stmt !== false) {
-  			foreach ($paramHash as $pkey => $pval) {
-  				$stmt->bindParam($pkey, $pval);
-  			}
-        $stmt->execute();
-      }
+			if ($stmt !== false) {
+  				foreach ($paramHash as $pkey => $pval) {
+  					$stmt->bindValue($pkey, $pval);
+  				}
+  				$stmt->execute();
+			}
 		}
 		if ($stmt === false) {
-      $errorInfo = $dbh->errorinfo();
-      $errorMsg = $errorInfo[2];
-      throw new PDOException($errorMsg);
-    }
+			$errorInfo = $dbh->errorinfo();
+			$errorMsg = $errorInfo[2];
+			throw new PDOException($errorMsg);
+		}
 		$results = $stmt->fetchAll();
 		if ($this->resultsToUpper) {
 			$results = $this->getResultsAsUppercase($results);
@@ -78,7 +78,7 @@ abstract class PluralModel {
 			foreach ($paramHash as $pkey => $pval) {
 				$stmt->bindParam($pkey, $pval);
 			}
-      $stmt->execute();
+			$stmt->execute();
       
 			$resultSet = $stmt->fetchAll();
 			if ($this->resultsToUpper) {
