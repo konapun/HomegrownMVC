@@ -104,7 +104,7 @@ class HTTPRequest {
 				return false;
 			}
 			if ($withValues) {
-				if (!$this->fieldValue($field)) {
+				if (!$this->getFieldValue($field)) {
 					return false;
 				}
 			}
