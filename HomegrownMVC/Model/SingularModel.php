@@ -23,15 +23,15 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 		$this->fields = array();
 		$this->anomalies = $this->handlePropertyConstructionAnomalies();
 		foreach ($this->listProperties() as $maybeKey => $maybeDefault) {
-      if (is_int($maybeKey)) { // Probably the property index since we require keys be strings, the real key will be in $maybeDefault
-        $this->fields[$maybeDefault] = null;
-      }
-      else { // Property with default value
-        $this->fields[$maybeKey] = $maybeDefault;
-      }
+			if (is_int($maybeKey)) { // Probably the property index since we require keys be strings, the real key will be in $maybeDefaul
+				$this->fields[$maybeDefault] = null;
+			}
+			else { // Property with default value
+				$this->fields[$maybeKey] = $maybeDefault;
+			}
 		}
-
-    $fields = $this->giveDefaults($fields);
+		
+		$fields = $this->giveDefaults($fields);
 		if (count($fields) > 1) {
 			$this->constructFromProperties($fields);
 		}
@@ -50,8 +50,9 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 	 * Return whether or not a field is set for this model
 	 */
 	function hasField($field) {
-		return isset($this->fields[$field]);
+		return array_key_exists($field, $this->fields);
 	}
+	
 	/*
 	 * Generic way of getting a model's field value
 	 */
