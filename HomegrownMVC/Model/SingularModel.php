@@ -31,8 +31,9 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 			}
 		}
 		
+		$fieldCount = count($fields);
 		$fields = $this->giveDefaults($fields);
-		if (count($fields) > 1) {
+		if ($fieldCount > 1) {
 			$this->constructFromProperties($fields);
 		}
 		else {
