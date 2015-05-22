@@ -8,11 +8,13 @@ namespace HomegrownMVC\Request;
  */
 class HTTPRequest {
 	private $requestInfo;
+	private $method;
 	private $fields;
 	private $routeName;
 	
 	function __construct() {
 		$this->requestInfo = $_REQUEST;
+		$this->method = $_SERVER['REQUEST_METHOD'];
 		$this->fields = array_keys($this->requestInfo);
 		$this->routeName = $this->formatRoute($_SERVER['REQUEST_URI']);
 	}
@@ -47,6 +49,13 @@ class HTTPRequest {
 		}
 		
 		return $value;
+	}
+	
+	/*
+	 * The method for this request; i.e. 'GET', 'HEAD', 'POST', 'PUT'
+	 */
+	function getMethod() {
+		return $this->method;
 	}
 	
 	/*
