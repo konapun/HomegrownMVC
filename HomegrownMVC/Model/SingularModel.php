@@ -64,7 +64,26 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 
 		return $this->fields[$field];
 	}
+	
+	/*
+	 * Attempt to set the value of a field, returning false if there is no field
+	 * with that key for this model
+	 */
+	function setValue($field, $val) {
+		if (!array_key_exists($field, $this->fields)) {
+			return false;
+		}
 
+		if (isset($this->anomalies[$field])) { // custom handling for special cases
+			$convertFn = $this->anomalies[$field];
+			$this->fields[$field] = $convertFn($val);
+		}
+		else { // value is a primitive (default)
+			$this->fields[$field] = $val;
+		}
+		return true;
+	}
+	
 	/*
 	 * Return a hashed version of this model for easy consumption by the view
 	 * engine
@@ -103,25 +122,6 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 	 */
 	protected function handlePropertyConstructionAnomalies() {
 		return array();
-	}
-
-	/*
-	 * Attempt to set the value of a field, returning false if there is no field
-	 * with that key for this model
-	 */
-	private function setValue($field, $val) {
-		if (!array_key_exists($field, $this->fields)) {
-			return false;
-		}
-
-		if (isset($this->anomalies[$field])) { // custom handling for special cases
-			$convertFn = $this->anomalies[$field];
-			$this->fields[$field] = $convertFn($val);
-		}
-		else { // value is a primitive (default)
-			$this->fields[$field] = $val;
-		}
-		return true;
 	}
 
 	/*
