@@ -126,6 +126,13 @@ class HTTPRequest {
 		return false;
 	}
 	
+	/*
+	 * Convert this request to a HTTP request string
+	 */
+	function toString() {
+		// TODO
+	}
+
 	private function formatRoute($uri) {
 		$route = $uri;
 		$pstart = strrpos($uri, '?');

@@ -3,43 +3,47 @@ namespace HomegrownMVC;
 
 /*
  * Manage routes by finding the correct controller
- * 
+ *
  * Author: Bremen Braun
  */
-
 class Router {
 	private $controllers;
 	private $forwards;
-	
+
 	function __construct() {
 		$this->controllers = array();
 		$this->forwards = array();
+		$this->events = array( // events triggered on handleRoute
+			'before' => array(),
+			'after'  => array()
+		);
 	}
-	
+
 	/*
 	 * Redirect one route to another without altering the URL
 	 */
 	function redirect($from, $to) {
 		$this->forwards[$from] = $to;
 	}
-	
+
 	/*
 	 * Add a controller to search for a route
 	 */
 	function addController($controller) {
 		array_push($this->controllers, $controller);
 	}
-	
+
 	/*
 	 * Automatically load all controllers in a directory, given there is
 	 * a single controller per file and the controller class has the same
 	 * name as the file, minus the .php extension
 	 */
 	function autoloadControllers($context, $directory='controllers') {
+		$context->stash('router', $this);
 		if (is_dir($directory)) {
 			foreach (glob("$directory/*.php") as $phpFile) {
 				include_once($phpFile);
-				
+
 				$className = $this->getClassnameFromFile(basename($phpFile));
 				if ($className) {
 					$class = new \ReflectionClass($className);
@@ -50,7 +54,15 @@ class Router {
 			}
 		}
 	}
-	
+
+	function beforeHandleRoute($callback) {
+		array_push($this->events['before'], $callback);
+	}
+
+	function afterHandleRoute($callback) {
+		array_push($this->events['after'], $callback);
+	}
+
 	/*
 	 * Invoke an action from a controller which provides the specified route.
 	 * If no route is given, the current URL is used.
@@ -58,11 +70,17 @@ class Router {
 	 */
 	function handleRoute($route=null) {
 		if ($route == null) $route = $_SERVER['REQUEST_URI'];
-		
+
 		/* See if any controller can handle the URI */
-		return $this->forceFindRoute($route);
+		foreach  ($this->events['before'] as $event) {
+			$event();
+		}
+		$handled = $this->forceFindRoute($route);
+		foreach ($this->events['after'] as $event) {
+			$event($handled);
+		}
 	}
-	
+
 	/*
 	 * Try to locate a route both with and without a trailing /
 	 * Returns true or false depending on whether or not the route was handled
@@ -76,13 +94,13 @@ class Router {
 			else {
 				$route .= '/';
 			}
-			
+
 			$foundRoute = $this->findRoute($route);
 		}
-		
+
 		return $foundRoute;
 	}
-	
+
 	/*
 	 * Attempt to invoke a controller action for a given route
 	 * Returns true or false depending on whether or not the route was handled
@@ -92,16 +110,16 @@ class Router {
 		$foundRoute = false;
 		foreach ($this->controllers as $controller) {
 			try {
-				$controller->invokeRoute($route); 
+				$controller->invokeRoute($route);
 				$foundRoute = true;
 				break;
 			}
 			catch (\Exception $e) {}
 		}
-		
+
 		return $foundRoute;
 	}
-	
+
 	/*
 	 * Check if a route maps to a redirect.
 	 * If so, return the forwarded route, else the route as passed in
@@ -114,15 +132,14 @@ class Router {
 				break;
 			}
 		}
-		
+
 		return $forwarded;
 	}
-	
+
 	private function getClassnameFromFile($file) {
 		if (preg_match('/(.*)\.php/', $file, $matches)) {
 			return $matches[1];
 		}
 	}
 }
-
 ?>
