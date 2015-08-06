@@ -79,6 +79,8 @@ class Router {
 		foreach ($this->events['after'] as $event) {
 			$event($handled);
 		}
+
+		return $handled;
 	}
 
 	/*
