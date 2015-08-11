@@ -10,10 +10,10 @@ abstract class FixtureModel {
   private $data;
   private $dbh;
   private $singularClassName;
-  
+
   /*
    * Instantiate data collection either by data returned via `setupData` or by
-   * passing an array of SingularModels as the second argument 
+   * passing an array of SingularModels as the second argument
    */
   function __construct($dbh=null, $singularClassName="") {
     if (is_array($singularClassName)) {
@@ -22,23 +22,23 @@ abstract class FixtureModel {
     else {
       $this->instantiateByClassName($singularClassName);
     }
-    
+
     $this->dbh = $dbh;
   }
-  
+
   /*
    * Return an array of hashes containing data to use in creating the singular
    * version of this model
    */
   abstract protected function setupData();
-  
+
   /*
    * Get the database handle used to create this object
    */
   final function getDatabaseHandle() {
     return $this->dbh;
   }
-  
+
   /*
    * Return all data contained within this fixture as an array of instantiated
    * objects
@@ -46,10 +46,10 @@ abstract class FixtureModel {
   final function getAll($sortFn=null) {
     $data = $this->data;
     if ($sortFn) usort($data, $sortFn);
-    
+
     return $data;
   }
-  
+
   /*
    * Convenience method for filtering the data using a callback that takes an
    * object from the collection and returns true or false depending on whether
@@ -62,8 +62,22 @@ abstract class FixtureModel {
         array_push($found, $object);
       }
     }
-    
+
     return $found;
+  }
+
+  final function merge($otherSingulars) {
+    $merged = array_merge($this->getAll(), $otherSingulars);
+    return $this->copy($merged);
+  }
+
+  /*
+   * Copy an array of `SingularModel`s into a fixture model
+   */
+  final function copy($singulars) {
+    $clone = new static($this->dbh, $this->singularClassName);
+    $clone->data = $singulars;
+    return $clone;
   }
 
   /*
@@ -75,10 +89,10 @@ abstract class FixtureModel {
     foreach ($singulars as $singular) {
       array_push($hashedSingulars, $singular->hashify());
     }
-    
+
     return $hashedSingulars;
   }
-  
+
   /*
    * Instantiate by manually passing data. This is useful for chained filters
    * (etc. a `find` result is wrapped in a new FixtureModel instance so `find`
@@ -88,7 +102,7 @@ abstract class FixtureModel {
   private function instantiateFromData($data) {
     $this->data = $data;
   }
-  
+
   /*
    * Instantiate all data for this model, passing each SingularModel a database
    * handle $dbh (or null) and the name of the singular class to be created. If
@@ -100,11 +114,11 @@ abstract class FixtureModel {
     $this->singularClassName = $singularClassName;
     $this->data = $this->instantiateData($this->setupData());
   }
-  
+
   private function inferSingularClassName() {
     die("This functionality is not yet implemented. For now, pass the name of the singular class to create manually");
   }
-  
+
   private function instantiateData($arrayOfHashes) {
     $objects = array();
     $dbh = $this->dbh;
@@ -112,7 +126,7 @@ abstract class FixtureModel {
     foreach ($arrayOfHashes as $hash) {
       array_push($objects, new $class($dbh, $hash));
     }
-    
+
     return $objects;
   }
 }
