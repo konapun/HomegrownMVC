@@ -36,7 +36,7 @@ $context->stash('key'); // returns 'value'
 ```
 
 ## Using routes
-HomegrownMVC uses a router to locate controllers.
+HomegrownMVC uses a router to locate controllers, but controllers are responsible for declaring the routes they handle.
 ```php
 /*
  * This could be a snippet from your index.php file
@@ -80,8 +80,8 @@ A controller only has to define actions for routes it accepts. Arguments
 to the route are provided through the context
 
 ### Defining controllers
-Currently, two types of controllers are defined:
-  * **BaseController**: Routes are literal paths 
+Currently, three types of controllers are defined:
+  * **BaseController**: Routes are literal paths
 ```php
 /*
  * Sample controller which is a regular BaseController
@@ -89,15 +89,15 @@ Currently, two types of controllers are defined:
 class SearchController extends HomegrownMVC\Controller\BaseController {
 		protected function setupRoutes() {
 			$this->controllerBase('/search/');
-			
+
 			return array(
 				'person' => function($context) { //maps to www.example.com/search/person
 					$request = $context->getRequest();
 					$view = $context->getViewEngine();
-					
+
 					// This will depend on the object you're using to do HTTP requests
 					$name = $request->getParam('name');
-					
+
 					// This will depend on your view engine. You may use any, as this tiny framework doesn't provide one
 					$view->replaceVar('name', "Searching for $name");
 					$view->render();
@@ -117,7 +117,7 @@ class UserController extends HomegrownMVC\Controller\WildcardController {
 		protected function setupWildcardRoutes() {
 			$this->setWildcardCharacter(':'); // this is the default character, but you can change it to any single character
 			$this->controllerBase('/user/');
-			
+
 			return array(
 				':uid/profile' => function($context, $params) {
 					echo "Showing profile for user with ID " . $params['uid'];
@@ -130,6 +130,24 @@ class UserController extends HomegrownMVC\Controller\WildcardController {
 }
 ```
 
+  * **FrontController**: There are no routes but instead actions to run before and/or after a route is matched by the router. This controller is necessary for running actions that need to happen on every page, regardless of route and the controller that is invoked.
+```php
+/*
+ * Sample FrontController demonstrating its use
+ */
+class WrapperController extends HomegrownMVC\Controller\FrontController {
+  protected function setupFrontController() {
+    $this->beforeFrontRoutes(function($context) {
+      $dbh = $context->getDatabaseHandle();
+      $view = $context->getViewEngine();
+
+      $people = new People($dbh);
+      $view->assign('administrators', $people->findByRole(People::ADMINISTRATOR)); // assuming the "administrators" variable needs to be displayed on every page
+    });
+  }
+}
+```
+
 ### Controller rerouting
 A controller may conditionally reroute from one route to another. You may wish to do this if you have
 implemented a RESTful API but do not want to build results through AJAX.
@@ -137,7 +155,7 @@ implemented a RESTful API but do not want to build results through AJAX.
 class RerouteController extends HomegrownMVC\Controller\BaseController {
 	protected function setupRoutes() {
 		$that = $this;
-		
+
 		return array(
 			'route1' => function($context) {
 				echo "Doing route1";
@@ -174,10 +192,10 @@ class NavigationController extends HomegrownMVC\Controller\BaseController {
 		$this->beforeRoutes(function($context) {
 			$view = $context->getViewEngine();
 			$route = substr($context->getRequest()->routeName(), 1); // just remove the leading slash; since Homegrown(MV)C doesn't provide a Request class, your exact way of doing this will vary
-			
+
 			$view->replaceVar("$route-active", 'active'); // since Homegrown(MV)C doesn't provide a view engine, your exact way of doing this will vary
 		});
-		
+
 		return array(
 			// ...
 		);
@@ -192,7 +210,7 @@ class TestController extends HomegrownMVC\Controller\BaseController {
 	protected function setupRoutes() {
 		$this->afterRoutes(function($context) {
 			$view = $context->getViewEngine();
-			
+
 			$viewEngine->render();
 		});
 	}
@@ -208,7 +226,7 @@ Here is an example of using the stash to store a forward route for a route that 
 class AdminController extends HomegrownMVC\Controller\BaseController {
 	protected function setupRoutes() {
 		$this->controllerBase('/admin/');
-		
+
 		$that = $this;
 		$user = UserModel::getInstance();
 		return array(
@@ -221,7 +239,7 @@ class AdminController extends HomegrownMVC\Controller\BaseController {
 				else {
 					// authenticate user
 					// ...
-					
+
 					// user has been authenticated by this point, so redirect them to the page they were trying for
 					$that->invokeRoute($forwardRoute);
 				}
@@ -263,3 +281,52 @@ class ContextExampleController extends HomegrownMVC\Controller\BaseController {
 
 You can also share data between routes using `$req->setFieldValue('field', 'value')` if you're
 using HomegrownMVC\Request\HTTPRequest for your request provider.
+
+## Models
+HomegrownMVC comes with an optional models framework (though you can use whatever you'd like) and distinguishes between a model schema and a model collection.
+
+### Plural models / Fixture models (collection)
+Plural models are collections which extend
+`HomegrownMVC\Model\PluralModel` (for models which connect to a real database) or
+`HomegrownMVC\Model\FixtureModel` (for models which provide their data in-place as native PHP structures or
+load their data from flat files). The main purpose of plural models is to vivify singular models and provide
+methods for filtering the collection (`findByName`, `findByID`,  etc.). Every plural model must implement
+a protected function called `setupData` which returns an array of hashes whose keys correspond to the field
+names specified by a singular model. Most of the models in this project are `FixtureModel`s which load their
+data from CSV files in `models/data` using `HomegrownMVC\Model\DataImporter\CSVDataImporter` (see almost any
+plural model for examples).
+
+### Singular models (schema)
+Singular models specify the object schema by implementing a protected function called `listProperties` which
+returns an array of property names required to build an object of this instance. A singular model can also
+specify its means for construction by providing an implementation for a protected function `setupBuilders`
+which returns a mapping of keys to functions which provide an instantiation upon that key.
+
+    // Example setupBuilders function for Person.php
+    protected function setupBuilders($dbh) {
+      $people = new People($dbh);
+      return array(
+        'id' => function($id) use ($people) {
+          return $people->findByID($id);
+        }
+      );
+    }
+
+    // An example of instantiating a singular model with ID 0
+    $foundPerson = new Person($dbh, array(
+      'id' => 0 // Here we use the ID builder specified above
+    ));
+
+#### Extended CSV
+Data files are given in an extended CSV format which is normal CSV with the following addition: You may link
+text from other files as a field value by adding the `file:` prefix before giving the filename.
+
+For example, if you had a long person bio you didn't want to embed directly into the CSV file, you could
+place it externally as a file named "person_bio.txt" and include the text from that file into the field by
+doing
+
+    file:person_bio.txt
+
+You can constrain included files to a certain directory when using this feature by restricting its usage to files contained
+within the `models/data/text` directory so when specifying the file to link, specify it relative to this
+directory (e.g. models/data/text/person_bio.txt would be given as `file:person_bio.txt`)
