@@ -283,7 +283,7 @@ You can also share data between routes using `$req->setFieldValue('field', 'valu
 using HomegrownMVC\Request\HTTPRequest for your request provider.
 
 ## Models
-HomegrownMVC comes with an optional models framework (though you can use whatever you'd like) and distinguishes between a model schema and a model collection.
+HomegrownMVC comes with an optional models framework (though you can use whatever you'd like) and distinguishes between a model schema and a model collection. Models can be converted into hashes in order to be easily consumed by the view layer.
 
 ### Plural models / Fixture models (collection)
 Plural models are collections which extend
