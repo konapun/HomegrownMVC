@@ -96,6 +96,13 @@ class HTTPRequest {
 	}
 	
 	/*
+	 * Dump request parameters to a hash
+	 */
+	function getFieldDump() {
+		return $this->requestInfo;
+	}
+	
+	/*
 	 * Check that all fields exist and, optionally, that they all have values
 	 */
 	function validateFields($fields, $withValues=false) {
