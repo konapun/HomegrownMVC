@@ -31,6 +31,19 @@ class HTTPRequest {
 	}
 	
 	/*
+	 * Return whether or not all fields exist in the request
+	 */
+	function hasFields($fieldNames) {
+		foreach ($fieldNames as $name) {
+			if (!$this->hasField($name)) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	/*
 	 * Setting a field's value might be useful when sharing data between routes
 	 * within a controller with forwarding
 	 */
