@@ -17,6 +17,8 @@ include_once($homegrownBase . 'Context.php');
 include_once($homegrownBase . 'Router.php');
 include_once($homegrownBase . 'Request' . DIRECTORY_SEPARATOR . 'HTTPRequest.php');
 include_once($behaviorsBase . 'Hashable.php');
+include_once($behaviorBase . 'Commitable.php');
+include_once($behaviorBase . 'Updateable.php');
 include_once($controllerBase . 'IController.php');
 include_once($controllerBase . 'BaseController.php');
 include_once($controllerBase . 'FrontController.php');
