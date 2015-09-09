@@ -81,6 +81,37 @@ abstract class FixtureModel {
   }
 
   /*
+   * Write changes from $singular back to the file, if possible
+   */
+   /*
+  function commit($updatedUser) {
+    $rows = array();
+    $schema = array();
+    foreach ($this->getAll() as $user) {
+      if (!$schema) { // get schema and write header
+        $schema = $user->getSchema();
+        $fields = array();
+        foreach ($schema as $column) {
+          $fields[$column] = $column;
+        }
+
+        array_push($rows, $fields);
+      }
+
+      if ($user->equals($updatedUser)) $user = $updatedUser;
+      $fields = array();
+      foreach ($schema as $column) {
+        $fields[$column] = $user->getValue($column);
+      }
+
+      array_push($rows, $fields);
+    }
+
+    $this->importer->exportData($rows); // FIXME
+  }
+  */
+
+  /*
    * Cast an array of singulars to a hash type that can be consumed by Smarty
    * - ex: $plural::hashify($singulars)
    */

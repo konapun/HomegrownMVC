@@ -30,7 +30,7 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 				$this->fields[$maybeKey] = $maybeDefault;
 			}
 		}
-		
+
 		$fieldCount = count($fields);
 		$fields = $this->giveDefaults($fields);
 		if ($fieldCount > 1) {
@@ -53,7 +53,7 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 	function hasField($field) {
 		return array_key_exists($field, $this->fields);
 	}
-	
+
 	/*
 	 * Generic way of getting a model's field value
 	 */
@@ -64,7 +64,7 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 
 		return $this->fields[$field];
 	}
-	
+
 	/*
 	 * Attempt to set the value of a field, returning false if there is no field
 	 * with that key for this model
@@ -83,13 +83,38 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 		}
 		return true;
 	}
-	
+
 	/*
 	 * Return a hashed version of this model for easy consumption by the view
 	 * engine
 	 */
 	function hashify() {
 		return $this->fields;
+	}
+
+	/*
+	 * Return whether or not this is equal to another Singular Model. You can
+	 * override this to change the behavior, for instance to check equality based
+	 * on an ID
+	 */
+	function equals($singular) {
+		foreach ($singular->getSchema() as $column) {
+			if ($this->hasField($column) && $this->getValue($column) == $singular->getValue($column)) continue;
+			return false;
+		}
+
+		return true;
+	}
+
+	/*
+	 * Return the reference ID for this object
+	 */
+	function __toString() {
+		return spl_object_hash($this);
+	}
+
+	final function getSchema() {
+		return $this->listProperties();
 	}
 
 	/*
@@ -236,4 +261,3 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 	}
 }
 ?>
-
