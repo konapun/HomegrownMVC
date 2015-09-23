@@ -107,6 +107,17 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 	}
 
 	/*
+	 * Return a clone of this object with the same field values
+	 */
+	function clone() {
+		$fields = array();
+		foreach ($this->getSchema() as $prop) {
+			$fields[$prop] = $this->getValue($prop);
+		}
+		return new static($this->getDatabaseHandle(), $fields);
+	}
+
+	/*
 	 * Return the reference ID for this object
 	 */
 	function __toString() {
