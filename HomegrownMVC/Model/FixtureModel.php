@@ -155,7 +155,12 @@ abstract class FixtureModel {
     $dbh = $this->dbh;
     $class = $this->singularClassName;
     foreach ($arrayOfHashes as $hash) {
-      array_push($objects, new $class($dbh, $hash));
+      if (is_array($hash)) { // instantiate from data
+        array_push($objects, new $class($dbh, $hash));
+      }
+      else { // or this could be the object itself
+        array_push($object, $hash);
+      }
     }
 
     return $objects;
