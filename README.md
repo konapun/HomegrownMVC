@@ -10,6 +10,9 @@ This is a router/controller microframework (with other optional elements) born o
 I inherited more manageable. The router/controller portion has no coupling to anything else (dependency injection is managed through the context),
 and as a result should work with any templating system and DBAL.
 
+## Caveats
+There is currently no way to match routes based on HTTP verbs and no such functionality is planned for the future.
+
 ## Recommended setup
 Although Homegrown is written to be flexible and modular, it is known to work well with the following setup:
   * **router/controllers**: HomegrownMVC (read on for documentation for this portion)
