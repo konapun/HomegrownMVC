@@ -74,6 +74,16 @@ if (!$router->handleRoute()) {
 }
 ```
 
+### Error handling in routes
+By default, errors will be swallowed. This is useful to shield end-users from exceptions by invoking an error route in the case where an exception is thrown by a route. However, this can make debugging annoying; you can set the router to handle exceptions which are not of type `\HomegrownMVC\Error\RouteNotDefinedException` with your own custom handler. If you do not set your own handler, the default action is to echo the `errorMessage` to the page.
+
+```php
+$router = new HomegrownMVC\Router(true); // "true" sets debug mode to true - the router to uses an action for when exceptions are encountered
+$router->handleException(function($exception) {
+  echo $exception->getMessage() . "<br>\n"; // echo the exception message when an exception is encountered (this is the default action)
+});
+```
+
 ## Controllers
 A HomegrownMVC controller extends the abstract BaseController class.
 A controller only has to define actions for routes it accepts. Arguments

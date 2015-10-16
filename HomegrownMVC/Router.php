@@ -7,16 +7,39 @@ namespace HomegrownMVC;
  * Author: Bremen Braun
  */
 class Router {
+	private $debug;
+	private $exceptionHandler;
 	private $controllers;
 	private $forwards;
 
-	function __construct() {
+	function __construct($debug=false) {
+		$this->debug = $debug;
 		$this->controllers = array();
 		$this->forwards = array();
 		$this->events = array( // events triggered on handleRoute
 			'before' => array(),
 			'after'  => array()
 		);
+		$this->exceptionHandler = function($e) {
+			echo $e->getMessage() . "<br>\n";
+		};
+	}
+
+	/*
+   * When debug is set to true, a custom error handler will be used for
+   * exceptions which are not of type `RouteNotDefinedException`
+	 */
+	function debug($debug=true) {
+		$this->debug = $debug;
+	}
+
+	/*
+   * Set a custom error handler. The default action is to echo the error
+   * message to the page. $fn should be a function which takes a single argument
+   * which is the Exception object being thrown.
+	 */
+	function handleException($fn) {
+		$this->exceptionHandler = $fn;
 	}
 
 	/*
@@ -116,7 +139,12 @@ class Router {
 				$foundRoute = true;
 				break;
 			}
-			catch (\Exception $e) {}
+			catch (\Exception $e) {
+				if ($this->debug && !($e instanceof \HomegrownMVC\Error\RouteNotDefinedException)) {
+					$handler = $this->exceptionHandler;
+					$handler($e);
+				}
+			}
 		}
 
 		return $foundRoute;
