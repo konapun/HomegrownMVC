@@ -116,6 +116,8 @@ abstract class FixtureModel {
    * - ex: $plural::hashify($singulars)
    */
   static function hashify($singulars) {
+    if (!is_array($singulars)) $singulars = array($singulars);
+
     $hashedSingulars = array();
     foreach ($singulars as $singular) {
       array_push($hashedSingulars, $singular->hashify());
