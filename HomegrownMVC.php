@@ -34,4 +34,5 @@ include_once($errorBase . 'ResultNotFoundException.php');
 include_once($errorBase . 'RouteNotDefinedException.php');
 include_once($errorBase . 'CSVFormatException.php');
 include_once($errorBase . 'IOException.php');
+include_once($errorBase . 'VisibilityException.php');
 ?>
