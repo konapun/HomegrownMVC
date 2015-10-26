@@ -5,6 +5,7 @@ use HomegrownMVC\Behaviors\Hashable;
 use HomegrownMVC\Error\BuildException as BuildException;
 use HomegrownMVC\Error\ResultNotFoundException as ResultNotFoundException;
 use HomegrownMVC\Error\VisibilityException as VisibilityException;
+use HomegrownMVC\Error\MethodCallException as MethodCallException;
 
 /*
  * A singular model is the return type of its plural model queries
@@ -146,7 +147,7 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 		if ($method->getNumberOfRequiredParameters() > 0) {
 			throw new \InvalidArgumentException("Can't cache for method '$methodName' - caching is currently only available for methods which take no arguments");
 		}
-		
+
 		$method->setAccessible(false); // this way, the original method can't be called by the user which forces the call to go through __call, which uses the cacheable version
 		if ($method->isPublic()) {
 			throw new VisibilityException("Error caching method '$methodName' - Cacheable methods must be declared as 'protected' or 'private'");
@@ -180,6 +181,8 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 				return $ret;
 			}
 		}
+
+		throw new MethodCallException("Can't locate method '$method' in class " . get_class(self));
 	}
 
 	final function getSchema() {
