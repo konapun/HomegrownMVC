@@ -11,7 +11,7 @@ class HTTPRequest {
 	private $method;
 	private $fields;
 	private $routeName;
-	
+
 	function __construct() {
 		$this->requestInfo = $_REQUEST;
 		$this->method = $_SERVER['REQUEST_METHOD'];
@@ -22,14 +22,14 @@ class HTTPRequest {
 	function routeName() {
 		return $this->routeName;
 	}
-	
+
 	/*
 	 * Return whether or not a field exists in the request
 	 */
 	function hasField($fieldName) {
 		return array_key_exists($fieldName, $this->requestInfo);
 	}
-	
+
 	/*
 	 * Return whether or not all fields exist in the request
 	 */
@@ -39,10 +39,10 @@ class HTTPRequest {
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	/*
 	 * Setting a field's value might be useful when sharing data between routes
 	 * within a controller with forwarding
@@ -51,7 +51,7 @@ class HTTPRequest {
 		$this->requestInfo[$fieldName] = $fieldValue;
 		array_push($this->fields, $fieldName);
 	}
-	
+
 	/*
 	 * Return the value for a given field
 	 */
@@ -60,17 +60,17 @@ class HTTPRequest {
 		if ($this->hasField($fieldName)) {
 			$value = $this->requestInfo[$fieldName];
 		}
-		
+
 		return $value;
 	}
-	
+
 	/*
 	 * The method for this request; i.e. 'GET', 'HEAD', 'POST', 'PUT'
 	 */
 	function getMethod() {
 		return $this->method;
 	}
-	
+
 	/*
 	 * In some cases, a route may accept two mutually exclusive fields, such as
 	 * 'name' or 'id'. This function simply returns the value for the first
@@ -87,14 +87,14 @@ class HTTPRequest {
 						$field => $value
 					);
 				}
-				
+
 				return $value;
 			}
 		}
-		
+
 		return "";
 	}
-	
+
 	/*
 	 * Return all values for fields as an array ordered the same as the fields
 	 * which were passed in
@@ -102,19 +102,19 @@ class HTTPRequest {
 	function listFieldValues($fields) {
 		$values = array();
 		foreach ($fields as $field) {
-			array_push($values, $this->getFieldValue($field));		
+			array_push($values, $this->getFieldValue($field));
 		}
 
 		return $values;
 	}
-	
+
 	/*
 	 * Dump request parameters to a hash
 	 */
 	function getFieldDump() {
 		return $this->requestInfo;
 	}
-	
+
 	/*
 	 * Check that all fields exist and, optionally, that they all have values
 	 */
@@ -129,10 +129,10 @@ class HTTPRequest {
 				}
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	/*
 	 * Check that at least one field exists
 	 */
@@ -142,24 +142,32 @@ class HTTPRequest {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
-	
-	/*
-	 * Convert this request to a HTTP request string
-	 */
-	function toString() {
-		// TODO
-	}
 
+	/*
+   * Converts the request into a string for a GET request
+	 */
+	function toGetString($includeQuestionmark=true) {
+		$start = $includeQuestionmark ? '?' : '';
+		$params = array();
+		foreach ($this->fields as $key) {
+			$val = $this->getFieldValue($key);
+
+			$str = !!$val ? "$key=$val" : $key;
+			array_push($params, $str);
+		}
+		return $start . implode('&', $params);
+	}
+	
 	private function formatRoute($uri) {
 		$route = $uri;
 		$pstart = strrpos($uri, '?');
 		if ($pstart !== false) {
 			$route = substr($route, 0, $pstart);
 		}
-		
+
 		return $route;
 	}
 }
