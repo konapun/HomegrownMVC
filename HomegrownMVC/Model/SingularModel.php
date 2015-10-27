@@ -182,7 +182,7 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 			}
 		}
 
-		throw new MethodCallException("Can't locate method '$method' in class " . get_class(self));
+		throw new MethodCallException("Can't locate method '$method' in class " . get_class($this));
 	}
 
 	final function getSchema() {
