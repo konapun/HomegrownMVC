@@ -3,6 +3,7 @@ namespace HomegrownMVC\Model;
 
 use HomegrownMVC\Behaviors\Hashable;
 use HomegrownMVC\Error\BuildException as BuildException;
+use HomegrownMVC\Error\MultipleRoutesException as MultipleRoutesException;
 use HomegrownMVC\Error\ResultNotFoundException as ResultNotFoundException;
 use HomegrownMVC\Error\VisibilityException as VisibilityException;
 use HomegrownMVC\Error\MethodCallException as MethodCallException;
@@ -295,7 +296,7 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 
 		$result = $found;
 		if (is_array($result)) {
-      throw new BuildException("Builder returned multiple results (" . count($result) . ")");
+      throw new MultipleResultsException("Builder returned multiple results (" . count($result) . ")");
 		}
 		$this->cloneIntoThis($result);
 	}
