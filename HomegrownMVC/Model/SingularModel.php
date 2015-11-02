@@ -295,7 +295,7 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 
 		$result = $found;
 		if (is_array($result)) {
-			$result = $found[0];
+      throw new BuildException("Builder returned multiple results (" . count($result) . ")");
 		}
 		$this->cloneIntoThis($result);
 	}
