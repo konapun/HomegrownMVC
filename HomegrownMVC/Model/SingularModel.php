@@ -261,7 +261,10 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 		}
 
 		foreach ($properties as $pkey => $pval) {
-			if (!$this->setValue($pkey, $pval)) {
+			if (is_null($pval)) {
+				throw new BuildException("Null value given for property '$pkey'. Requires: $fieldstr");
+			}
+			else if (!$this->setValue($pkey, $pval)) {
 				throw new BuildException("Model has no property '$pkey'. Requires: $fieldstr");
 			}
 		}
@@ -303,7 +306,7 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
         throw new MultipleResultsException($result, "Builder returned multiple results (" . count($result) . ")");
       }
 		}
-    
+
 		$this->cloneIntoThis($result);
 	}
 
