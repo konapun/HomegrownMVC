@@ -150,7 +150,6 @@ class HTTPRequest {
    * Converts the request into a string for a GET request
 	 */
 	function toGetString($includeQuestionmark=true) {
-		$start = $includeQuestionmark ? '?' : '';
 		$params = array();
 		foreach ($this->fields as $key) {
 			$val = $this->getFieldValue($key);
@@ -158,9 +157,11 @@ class HTTPRequest {
 			$str = !!$val ? "$key=$val" : $key;
 			array_push($params, $str);
 		}
+		
+		$start = ($includeQuestionmark && $params) ? '?' : '';
 		return $start . implode('&', $params);
 	}
-	
+
 	private function formatRoute($uri) {
 		$route = $uri;
 		$pstart = strrpos($uri, '?');
