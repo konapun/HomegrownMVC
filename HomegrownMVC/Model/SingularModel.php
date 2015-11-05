@@ -325,7 +325,7 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 
   private function giveDefaults($fields) {
     foreach ($this->fields as $fieldKey => $fieldVal) {
-      if (!array_key_exists($fieldKey, $fields)) {
+      if (!array_key_exists($fieldKey, $fields) || is_null($fields[$fieldKey])) {
         $fields[$fieldKey] = $fieldVal;
       }
     }
