@@ -127,6 +127,32 @@ class Router {
 		return $handled;
 	}
 
+/* // FUTURE - support defing routes through the router which maps to controller actions
+	function loadRoutes($file) {
+
+	}
+
+	function get($url, $action) {
+
+	}
+
+	function put($url, $action) {
+
+	}
+
+	function post($url, $action) {
+
+	}
+
+	function patch($url, $action) {
+
+	}
+
+	function delete($url, $action) {
+
+	}
+*/
+
 	/*
 	 * Try to locate a route both with and without a trailing /
 	 * Returns true or false depending on whether or not the route was handled
