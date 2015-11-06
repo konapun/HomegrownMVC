@@ -9,11 +9,13 @@ namespace HomegrownMVC;
 class Router {
 	private $debug;
 	private $exceptionHandler;
+	private $baseRoute;
 	private $controllers;
 	private $forwards;
 
 	function __construct($debug=false) {
 		$this->debug = $debug;
+		$this->baseRoute = "";
 		$this->controllers = array();
 		$this->forwards = array();
 		$this->events = array( // events triggered on handleRoute
@@ -78,10 +80,29 @@ class Router {
 		}
 	}
 
+	/*
+   * Setting a base route is useful if this HomegrownMVC app is being hosted as
+   * a subdirectory of a larger project. Setting the base route will allow your
+   * controllers to specify their routes without the base route so that you app
+   * can be deployed more portably.
+	 */
+	function setBaseRoute($route) {
+		if (substr($route, -1) != '/') $route .= '/';
+		$this->baseRoute = $route;
+	}
+
+	/*
+   * Give an action to run before a route gets handled. FrontControllers define
+   * an entrypoint for this hook.
+	 */
 	function beforeHandleRoute($callback) {
 		array_push($this->events['before'], $callback);
 	}
 
+	/*
+   * Give an action to run after a route gets handled. FrontControllers define
+   * an entrypoint for this hook.
+	 */
 	function afterHandleRoute($callback) {
 		array_push($this->events['after'], $callback);
 	}
@@ -111,6 +132,7 @@ class Router {
 	 * Returns true or false depending on whether or not the route was handled
 	 */
 	private function forceFindRoute($route) {
+		$route = $this->getBaseRoute($route);
 		$foundRoute = $this->findRoute($route);
 		if (!$foundRoute) { // try finding route with or without a trailing /, depending on whether or not the original had it
 			if (substr($route, -1) == '/') {
@@ -124,6 +146,21 @@ class Router {
 		}
 
 		return $foundRoute;
+	}
+
+	/*
+	 * If a base route is defined, this method returns the part of the route after
+	 * the base route.
+	 */
+	private function getBaseRoute($route) {
+		if ($this->baseRoute) {
+			if (strpos($route, $this->baseRoute) !== false) {
+				$len = strlen($this->baseRoute);
+				$route = substr($route, $len);
+			}
+		}
+
+		return $route;
 	}
 
 	/*

@@ -77,6 +77,13 @@ if (!$router->handleRoute()) {
 }
 ```
 
+### Running a HomegrownMVC app as a subdirectory
+HomegrownMVC assumes it's being run from www.example.com/. If you want to run it from a subdirectory, such as www.example.com/app, you will need to modify your .htaccess (included in this project), and make a single change to your index.php:
+
+```php
+$router->setBaseRoute('app');
+```
+
 ### Error handling in routes
 By default, errors will be swallowed. This is useful to shield end-users from exceptions by invoking an error route in the case where an exception is thrown by a route. However, this can make debugging annoying; you can set the router to handle exceptions which are not of type `\HomegrownMVC\Error\RouteNotDefinedException` with your own custom handler. If you do not set your own handler, the default action is to echo the `errorMessage` to the page.
 
