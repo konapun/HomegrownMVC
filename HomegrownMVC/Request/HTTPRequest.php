@@ -35,7 +35,7 @@ class HTTPRequest {
 	 */
 	function doIfFieldExists($fieldName, $fnTrue, $fnFalse=null) {
 		if ($this->hasField($fieldName)) {
-			if ($fnTrue) return $fnTrue();
+			if ($fnTrue) return $fnTrue($this->getFieldValue($fieldName));
 		}
 		else {
 			if ($fnFalse) return $fnFalse();
