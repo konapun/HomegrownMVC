@@ -31,6 +31,25 @@ class HTTPRequest {
 	}
 
 	/*
+   * Run a function depending on whether or not a field exists
+	 */
+	function doIfFieldExists($fieldName, $fnTrue, $fnFalse=null) {
+		if ($this->hasField($fieldName)) {
+			if ($fnTrue) return $fnTrue();
+		}
+		else {
+			if ($fnFalse) return $fnFalse();
+		}
+	}
+
+	/*
+   * Run a function if a field does not exist
+	 */
+	function doUnlessFieldExists($fieldName, $fnFalse) {
+		return $this->doIfFieldExists($fieldName, null, $fnFalse);
+	}
+
+	/*
 	 * Return whether or not all fields exist in the request
 	 */
 	function hasFields($fieldNames) {
@@ -150,6 +169,7 @@ class HTTPRequest {
    * Converts the request into a string for a GET request
 	 */
 	function toGetString($includeQuestionmark=true) {
+		$start = $includeQuestionmark ? '?' : '';
 		$params = array();
 		foreach ($this->fields as $key) {
 			$val = $this->getFieldValue($key);
@@ -157,8 +177,6 @@ class HTTPRequest {
 			$str = !!$val ? "$key=$val" : $key;
 			array_push($params, $str);
 		}
-		
-		$start = ($includeQuestionmark && $params) ? '?' : '';
 		return $start . implode('&', $params);
 	}
 
