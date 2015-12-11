@@ -114,12 +114,14 @@ class HTTPRequest {
    *
    *   $val = $request->matchFirstMap(array(array( 'field1' => 'one' ), array( 'field2' => 'two' )), 'default');
 	 */
-	function matchFirstMap($fields, $default="") {
+	function matchFirstMap($maps, $default="") {
 		$val = $default;
-		foreach ($fields as $field => $value) {
-			if ($this->hasField($field)) {
-				$val = $value;
-				break;
+		foreach ($maps as $map) {
+			foreach ($map as $field => $value) {
+				if ($this->hasField($field)) {
+					$val = $value;
+					break;
+				}
 			}
 		}
 
