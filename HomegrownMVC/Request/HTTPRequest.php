@@ -91,6 +91,42 @@ class HTTPRequest {
 	}
 
 	/*
+   * Accepts a list of fields and returns the value for the first field
+   * encountered in the request. If no fields from $fields are in the request,
+   * $default is returned
+   *
+   *   $val = $request->matchFirst(array('field1', 'field2'), 'default');
+	 */
+	function matchFirst($fields, $default="") {
+		$val = $default;
+		foreach ($fields as $field) {
+			if ($this->hasField($field)) {
+				$val = $this->getFieldValue($field);
+				break;
+			}
+		}
+		return $val;
+	}
+
+	/*
+   * Accepts a map of fields to the value to be returned if that field is
+   * contained, otherwise $default is returned
+   *
+   *   $val = $request->matchFirstMap(array(array( 'field1' => 'one' ), array( 'field2' => 'two' )), 'default');
+	 */
+	function matchFirstMap($fields, $default="") {
+		$val = $default;
+		foreach ($fields as $field => $value) {
+			if ($this->hasField($field)) {
+				$val = $value;
+				break;
+			}
+		}
+
+		return $val;
+	}
+
+	/*
 	 * In some cases, a route may accept two mutually exclusive fields, such as
 	 * 'name' or 'id'. This function simply returns the value for the first
 	 * field encountered which has one. If $mapped is set to true, returns a map
