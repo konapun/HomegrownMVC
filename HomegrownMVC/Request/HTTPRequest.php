@@ -177,7 +177,7 @@ class HTTPRequest {
 	 */
 	function validateFields($fields, $withValues=false) {
 		foreach ($fields as $field) {
-			if (!$this->fieldExists($field)) {
+			if (!$this->hasField($field)) {
 				return false;
 			}
 			if ($withValues) {
