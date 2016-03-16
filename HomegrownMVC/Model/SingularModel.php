@@ -23,7 +23,7 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 	/*
 	 * Create a singular model either from properties or by querying on a field
 	 */
-	final function __construct($dbh, $fields) {
+	final function __construct($dbh, $fields, $ignoreExtra=false) {
 		$this->dbh = $dbh;
 		$this->reflection = null;
 		$this->fields = array();
@@ -41,7 +41,7 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 		$fieldCount = count($fields);
 		$fields = $this->giveDefaults($fields);
 		if ($fieldCount > 1) {
-			$this->constructFromProperties($fields);
+			$this->constructFromProperties($fields, $ignoreExtra);
 		}
 		else {
 			$this->constructFromBuilder($fields);
@@ -229,7 +229,7 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 	 * fields (converting a primitive from the database return to an object),
 	 * you can handle these in `handlePropertyConstructionAnomalies`.
 	 */
-	private function constructFromProperties($properties) {
+	private function constructFromProperties($properties, $ignoreExtra) {
 		$nprops = count($properties);
 		$nfields = count($this->fields);
 
@@ -242,7 +242,7 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 		}
 
 		$errPrefix = "";
-		if ($nprops > $nfields) {
+		if (!$ignoreExtra && ($nprops > $nfields)) {
 			$errPrefix = "Too many properties given.";
 		}
 		else if ($nprops < $nfields) {
@@ -264,7 +264,7 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 			if (is_null($pval)) {
 				throw new BuildException("Null value given for property '$pkey'. Requires: $fieldstr");
 			}
-			else if (!$this->setValue($pkey, $pval)) {
+			else if (!$ignoreExtra && !$this->setValue($pkey, $pval)) {
 				throw new BuildException("Model has no property '$pkey'. Requires: $fieldstr");
 			}
 		}

@@ -84,6 +84,15 @@ class HTTPRequest {
 	}
 
 	/*
+   * Decode the field value as JSON
+	 */
+	function getJsonValue($fieldName) {
+		$value = $this->getFieldValue($fieldName);
+		if (!$value) $value = "{}";
+		return json_decode($value, true);
+	}
+	
+	/*
 	 * The method for this request; i.e. 'GET', 'HEAD', 'POST', 'PUT'
 	 */
 	function getMethod() {
