@@ -264,8 +264,11 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 			if (is_null($pval)) {
 				throw new BuildException("Null value given for property '$pkey'. Requires: $fieldstr");
 			}
-			else if (!$ignoreExtra && !$this->setValue($pkey, $pval)) {
-				throw new BuildException("Model has no property '$pkey'. Requires: $fieldstr");
+			else {
+				$setValue = $this->setValue($pkey, $pval);
+				if (!$ignoreExtra && !$setValue) {
+					throw new BuildException("Model has no property '$pkey'. Requires: $fieldstr");
+				}
 			}
 		}
 	}
