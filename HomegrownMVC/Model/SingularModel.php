@@ -29,6 +29,7 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 		$this->fields = array();
 		$this->cache = array();
 		$this->anomalies = $this->handlePropertyConstructionAnomalies();
+		$this->initialize();
 		foreach ($this->listProperties() as $maybeKey => $maybeDefault) {
 			if (is_int($maybeKey)) { // Probably the property index since we require keys be strings, the real key will be in $maybeDefaul
 				$this->fields[$maybeDefault] = null;
@@ -189,6 +190,11 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 	final function getSchema() {
 		return $this->listProperties();
 	}
+
+	/*
+   * Define a function to run before this object is created
+	 */
+	protected function initialize() {}
 
 	/*
 	 * Define a function to run after this object is created

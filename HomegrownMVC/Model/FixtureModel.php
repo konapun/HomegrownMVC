@@ -9,6 +9,7 @@ namespace HomegrownMVC\Model;
 abstract class FixtureModel {
   private $data;
   private $dbh;
+  private $ignoreExtraSetupFields;
   private $singularClassName;
 
   /*
@@ -24,6 +25,7 @@ abstract class FixtureModel {
     }
 
     $this->dbh = $dbh;
+    $this->ignoreExtraSetupFields = false;
   }
 
   /*
@@ -112,6 +114,14 @@ abstract class FixtureModel {
   */
 
   /*
+   * When building SingularModels from `setupData`, allow passing extra fields
+   * other than the required to the model's builder
+   */
+  final protected function ignoreExtraSetupFields($bool=true) {
+    $this->ignoreExtraSetupFields = $bool;
+  }
+
+  /*
    * Cast an array of singulars to a hash type that can be consumed by Smarty
    * - ex: $plural::hashify($singulars)
    */
@@ -158,7 +168,7 @@ abstract class FixtureModel {
     $class = $this->singularClassName;
     foreach ($arrayOfHashes as $hash) {
       if (is_array($hash)) { // instantiate from data
-        array_push($objects, new $class($dbh, $hash));
+        array_push($objects, new $class($dbh, $hash, $this->ignoreExtraSetupFields));
       }
       else { // or this could be the object itself
         array_push($object, $hash);
