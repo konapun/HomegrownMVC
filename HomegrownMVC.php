@@ -12,7 +12,21 @@ $modelBase = $homegrownBase . 'Model' . DIRECTORY_SEPARATOR;
 $importerBase = $modelBase . DIRECTORY_SEPARATOR . 'DataImporter' . DIRECTORY_SEPARATOR;
 $behaviorsBase = $homegrownBase . 'Behaviors' . DIRECTORY_SEPARATOR;
 $errorBase = $homegrownBase . 'Error' . DIRECTORY_SEPARATOR;
+$utilBase = $homegrownBase . 'Util' . DIRECTORY_SEPARATOR;
 
+include_once($errorBase . 'BuildException.php');
+include_once($errorBase . 'ClassNotFoundException.php');
+include_once($errorBase . 'MalformedUrlException.php');
+include_once($errorBase . 'MethodCallException.php');
+include_once($errorBase . 'MultipleResultsException.php');
+include_once($errorBase . 'NameInferenceException.php');
+include_once($errorBase . 'PDOException.php');
+include_once($errorBase . 'ResultNotFoundException.php');
+include_once($errorBase . 'RouteNotDefinedException.php');
+include_once($errorBase . 'CSVFormatException.php');
+include_once($errorBase . 'IOException.php');
+include_once($errorBase . 'VisibilityException.php');
+include_once($utilBase . 'NameInferer.php');
 include_once($homegrownBase . 'Context.php');
 include_once($homegrownBase . 'Router.php');
 include_once($homegrownBase . 'Request' . DIRECTORY_SEPARATOR . 'HTTPRequest.php');
@@ -27,14 +41,5 @@ include_once($importerBase . 'ExtendedCSVDataImporter.php');
 include_once($modelBase . 'PluralModel.php');
 include_once($modelBase . 'SingularModel.php');
 include_once($modelBase . 'FixtureModel.php');
-include_once($errorBase . 'BuildException.php');
-include_once($errorBase . 'MalformedUrlException.php');
-include_once($errorBase . 'MethodCallException.php');
-include_once($errorBase . 'MultipleResultsException.php');
-include_once($errorBase . 'PDOException.php');
-include_once($errorBase . 'ResultNotFoundException.php');
-include_once($errorBase . 'RouteNotDefinedException.php');
-include_once($errorBase . 'CSVFormatException.php');
-include_once($errorBase . 'IOException.php');
-include_once($errorBase . 'VisibilityException.php');
+
 ?>

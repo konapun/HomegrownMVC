@@ -1,6 +1,8 @@
 <?php
 namespace HomegrownMVC\Model;
 
+use HomegrownMVC\Util\NameInferer as NameInferer;
+
 /*
  * A model which is instantiated with data without needing a database
  *
@@ -153,13 +155,14 @@ abstract class FixtureModel {
    * the singular form of this class name
    */
   private function instantiateByClassName($singularClassName) {
-    if (!$singularClassName) $singularClassName = $this->inferSingularClassName();
+    if (!$singularClassName) $singularClassName = $this->inferSingularClassName(self);
     $this->singularClassName = $singularClassName;
     $this->data = $this->instantiateData($this->setupData());
   }
 
-  private function inferSingularClassName() {
-    die("This functionality is not yet implemented. For now, pass the name of the singular class to create manually");
+  private function inferSingularClassName($class) {
+    $inferer = new NameInferer(true);
+		return $inferer->inferSingularClassName($class);
   }
 
   private function instantiateData($arrayOfHashes) {

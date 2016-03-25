@@ -2,6 +2,7 @@
 namespace HomegrownMVC\Model;
 
 use HomegrownMVC\Error\PDOException as PDOException;
+use HomegrownMVC\Util\NameInferer as NameInferer;
 
 /*
  * A plural model is one that returns a number of singular models
@@ -11,10 +12,15 @@ use HomegrownMVC\Error\PDOException as PDOException;
 abstract class PluralModel {
 	private $dbh;
 	private $resultsToUpper = false;
+	private $singularClassName;
 
-	function __construct($dbh, $resultsToUpper=false) {
+	function __construct($dbh, $singularClassName="", $resultsToUpper=false) {
+		if (!$singularClassName) {
+			$singularClassName = $this->inferSingularClassName(self);
+		}
 		$this->dbh = $dbh;
-		$this->resultsToUpper = $resultsToUpper;
+		$this->singularClassName = $singularClassName;
+		$this->resultsToUpper = $this->setResultsUppercase($resultsToUpper);
 	}
 
 	/*
@@ -79,7 +85,7 @@ abstract class PluralModel {
 				$stmt->bindParam($pkey, $pval);
 			}
 			$stmt->execute();
-      
+
 			$resultSet = $stmt->fetchAll();
 			if ($this->resultsToUpper) {
 				$resultSet = $this->getResultsAsUppercase($resultSet);
@@ -123,7 +129,10 @@ abstract class PluralModel {
 	/*
 	 * Convert a hash to the type of this model's singular form
 	 */
-	abstract protected function castToProperType($hash);
+	protected function castToProperType($hash) {
+		$singularClass = $this->singularClassName;
+		return new $singularClass($this->getDatabaseHandle(), $hash, true);
+	}
 
 	/*
 	 * Define a function to run after results are prepared from the query and
@@ -160,6 +169,11 @@ abstract class PluralModel {
 		}
 
 		return $resultsUpper;
+	}
+
+	private function inferSingularClassName($class) {
+		$inferer = new NameInferer(true);
+		return $inferer->inferSingularClassName($class);
 	}
 }
 ?>
