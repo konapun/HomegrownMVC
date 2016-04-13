@@ -70,6 +70,14 @@ abstract class FixtureModel {
     return $found;
   }
 
+  final function filter($filterFn, $asObj=false) {
+    $filtered = array_filter($this->getAll(), $filterFn);
+    if ($asObj) {
+      $filtered = $this->copy($filtered);
+    }
+    return $filtered;
+  }
+
   final function merge($otherSingulars) {
     $merged = array_merge($this->getAll(), $otherSingulars);
     return $this->copy($merged);
