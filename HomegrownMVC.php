@@ -38,6 +38,7 @@ include_once($controllerBase . 'WildcardController.php');
 include_once($importerBase . 'IDataImporter.php');
 include_once($importerBase . 'CSVDataImporter.php');
 include_once($importerBase . 'ExtendedCSVDataImporter.php');
+include_once($importerBase . 'JSONDataImporter.php');
 include_once($modelBase . 'PluralModel.php');
 include_once($modelBase . 'SingularModel.php');
 include_once($modelBase . 'FixtureModel.php');
