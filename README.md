@@ -316,6 +316,8 @@ names specified by a singular model. Most of the models in this project are `Fix
 data from CSV files in `models/data` using `HomegrownMVC\Model\DataImporter\CSVDataImporter` (see almost any
 plural model for examples).
 
+Fixture models can also commit changes back to their flatfiles.
+
 ### Singular models (schema)
 Singular models specify the object schema by implementing a protected function called `listProperties` which
 returns an array of property names required to build an object of this instance. A singular model can also
