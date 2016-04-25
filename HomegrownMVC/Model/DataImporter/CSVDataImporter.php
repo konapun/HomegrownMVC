@@ -85,8 +85,8 @@ class CSVDataImporter implements IDataImporter {
     return $data;
   }
 
-  function exportData($rows, $file=null) {
-    if (!$file) $file = $this->file;
+  function exportData($rows) {
+    $file = $this->file;
 
     $fh = @fopen($file, 'w+');
     if ($fh === false) {

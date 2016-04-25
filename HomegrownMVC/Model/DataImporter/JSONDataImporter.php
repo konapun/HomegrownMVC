@@ -42,7 +42,7 @@ class JSONDataImporter implements IDataImporter {
     return $json;
   }
 
-  function exportData($rows, $file=null) {
+  function exportData($rows) {
     // TODO
   }
 }

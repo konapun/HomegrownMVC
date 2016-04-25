@@ -14,6 +14,7 @@ use HomegrownMVC\Error\MethodCallException as MethodCallException;
  * Author: Bremen Braun
  */
 abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
+	private $primaryKey;
 	private $fields;
 	private $anomalies;
 	private $reflection;
@@ -25,6 +26,7 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 	 */
 	final function __construct($dbh, $fields, $ignoreExtra=false) {
 		$this->dbh = $dbh;
+		$this->primaryKey = false;
 		$this->reflection = null;
 		$this->fields = array();
 		$this->cache = array();
@@ -63,7 +65,8 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 	}
 
 	/*
-	 * Generic way of getting a model's field value
+	 * Generic way of getting a model's field value.
+	 * Throws InvalidArgumentException if model has no field $field
 	 */
 	function getValue($field) {
 		if (!$this->hasField($field)) {
@@ -111,9 +114,17 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 	/*
 	 * Return whether or not this is equal to another Singular Model. You can
 	 * override this to change the behavior, for instance to check equality based
-	 * on an ID
+	 * on an ID.
+	 *
+	 * The default behavior is to compare on primary key. If no primary key is
+	 * available, a field equality check is performed.
 	 */
 	function equals($singular) {
+		if ($this->primaryKey) {
+			$pkey = $this->primaryKey;
+			return $this->getValue($pkey) == $singular->getValue($pkey);
+		}
+
 		foreach ($singular->getSchema() as $column) {
 			if ($this->hasField($column) && $this->getValue($column) == $singular->getValue($column)) continue;
 			return false;
@@ -188,7 +199,16 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 	}
 
 	final function getSchema() {
-		return $this->listProperties();
+		$schema = array();
+		$index = 0;
+		foreach ($this->listProperties() as $pkey => $pval) {
+			if ($pval && $pkey == $index) { // $pval is the actual key
+				$pkey = $pval;
+			}
+			array_push($schema, $pkey);
+			$index++;
+		}
+		return $schema;
 	}
 
 	/*
@@ -200,6 +220,13 @@ abstract class SingularModel implements \HomegrownMVC\Behaviors\Hashable {
 	 * Define a function to run after this object is created
 	 */
 	protected function configure() {}
+
+	/*
+   * Set the primary key which is the defualt method for comparisons
+	 */
+	final protected function setPrimaryKey($key) {
+		$this->primaryKey = $key;
+	}
 
 	/*
 	 * Returns a map of properties to its builder

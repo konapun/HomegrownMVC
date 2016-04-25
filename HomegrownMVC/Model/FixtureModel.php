@@ -2,6 +2,7 @@
 namespace HomegrownMVC\Model;
 
 use HomegrownMVC\Util\NameInferer as NameInferer;
+use HomegrownMVC\Error\IOException as IOException;
 
 /*
  * A model which is instantiated with data without needing a database
@@ -13,28 +14,40 @@ abstract class FixtureModel {
   private $dbh;
   private $ignoreExtraSetupFields;
   private $singularClassName;
+  private $io;
 
   /*
    * Instantiate data collection either by data returned via `setupData` or by
    * passing an array of SingularModels as the second argument
    */
-  function __construct($dbh=null, $singularClassName="") {
+  function __construct($dbh=null, $io=null, $singularClassName="") {
+    if (is_string($io)) {
+      $singularClassName = $io;
+      $io = null;
+    }
+    elseif ($io) {
+      if (!$io instanceof \HomegrownMVC\Model\DataImporter\IDataImporter) {
+        throw new \InvalidArgumentException("IO must be instance of HomegrownMVC\Model\DataImporter\IDataImporter");
+      }
+    }
+
+    $this->dbh = $dbh;
+    $this->io = $io;
+    $this->ignoreExtraSetupFields = false;
+
     if (is_array($singularClassName)) {
       $this->instantiateFromData($singularClassName);
     }
     else {
       $this->instantiateByClassName($singularClassName);
     }
-
-    $this->dbh = $dbh;
-    $this->ignoreExtraSetupFields = false;
   }
 
   /*
    * Return an array of hashes containing data to use in creating the singular
    * version of this model
    */
-  abstract protected function setupData();
+  abstract protected function setupData($importer);
 
   /*
    * Get the database handle used to create this object
@@ -95,13 +108,16 @@ abstract class FixtureModel {
   /*
    * Write changes from $singular back to the file, if possible
    */
-   /*
-  function commit($updatedUser) {
+  function commit($updatedSingular, $io=null) {
+    if (!$io) $io = $this->io;
+    if (is_null($io)) {
+      throw new IOException("Data importer/exporter is not available");
+    }
     $rows = array();
     $schema = array();
-    foreach ($this->getAll() as $user) {
+    foreach ($this->getAll() as $singular) {
       if (!$schema) { // get schema and write header
-        $schema = $user->getSchema();
+        $schema = $singular->getSchema();
         $fields = array();
         foreach ($schema as $column) {
           $fields[$column] = $column;
@@ -110,18 +126,16 @@ abstract class FixtureModel {
         array_push($rows, $fields);
       }
 
-      if ($user->equals($updatedUser)) $user = $updatedUser;
+      if ($singular->equals($updatedSingular)) $singular = $updatedSingular;
       $fields = array();
       foreach ($schema as $column) {
-        $fields[$column] = $user->getValue($column);
+        $fields[$column] = $singular->getValue($column);
       }
 
       array_push($rows, $fields);
     }
-
-    $this->importer->exportData($rows); // FIXME
+    $io->exportData($rows);
   }
-  */
 
   /*
    * When building SingularModels from `setupData`, allow passing extra fields
@@ -165,7 +179,7 @@ abstract class FixtureModel {
   private function instantiateByClassName($singularClassName) {
     if (!$singularClassName) $singularClassName = $this->inferSingularClassName(self);
     $this->singularClassName = $singularClassName;
-    $this->data = $this->instantiateData($this->setupData());
+    $this->data = $this->instantiateData($this->setupData($this->io));
   }
 
   private function inferSingularClassName($class) {
