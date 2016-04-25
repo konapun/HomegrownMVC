@@ -10,9 +10,10 @@ use HomegrownMVC\Error\IOException as IOException;
  */
 class ExtendedCSVDataImporter extends CSVImporter {
   private $prefix = 'file:';
+  private $arrayElementSeparator = "|";
   private $globalImportPath = "";
   private $importPaths = array();
-  
+
   /*
    * Set the prefix that will be used to identify a column value as data which
    * is to be loaded from an external file. If this is not set manually, the
@@ -21,11 +22,19 @@ class ExtendedCSVDataImporter extends CSVImporter {
   function setPrefix($prefix) {
     $this->prefix = $prefix;
   }
-  
+
   function getPrefix() {
     return $this->prefix;
   }
-  
+
+  function setArrayElementSeparator($separator) {
+    $this->arrayElementSeparator = $separator;
+  }
+
+  function getArrayElementSeparator() {
+    return $this->arrayElementSeparator;
+  }
+
   /*
    * You may want to limit file imports to a specific path for security. Paths
    * are appended to the filename on import. If a column name is not given, the
@@ -33,7 +42,7 @@ class ExtendedCSVDataImporter extends CSVImporter {
    */
   function setFilePath($path, $columnName="") {
     $lastChar = substr($path, -1);
-    
+
     if ($lastChar != DIRECTORY_SEPARATOR) $path .= DIRECTORY_SEPARATOR;
     if ($columnName) {
       $this->importPaths[$columnName] = $path;
@@ -42,14 +51,14 @@ class ExtendedCSVDataImporter extends CSVImporter {
       $this->globalImportPath = $path;
     }
   }
-  
+
   /*
    * Import data as normal, but check each column value for the set prefix
    * before loading data from a file as the field value
    */
   function importData() {
     $rows = parent::importData();
-    
+
     $extendedRows = array();
     $prefix = $this->getPrefix();
     foreach ($rows as $row) {
@@ -57,22 +66,42 @@ class ExtendedCSVDataImporter extends CSVImporter {
         if (strpos($data, $prefix) === 0) { // found prefix
           $filename = substr($data, strlen($prefix));
           $fullPath = $this->getFullPath($columnName, $filename);
-          
+
           if (!file_exists($fullPath)) {
             throw new IOException("Can't locate file \"$filename\" for reading");
           }
-          
+
           $content = file_get_contents($fullPath);
           $row[$columnName] = $content;
         }
+        // TODO: check for array
       }
-      
+
       array_push($extendedRows, $row);
     }
-    
+
     return $extendedRows;
   }
-  
+
+  function exportData($rows) {
+    $separator = $this->getArrayElementSeparator();
+
+    $extendedRows = array();
+    foreach ($rows as $row) {
+      $extendedRow = array();
+      foreach ($row as $key => $val) {
+        if (is_array($val)) {
+          $val = implode($separator, $val);
+        }
+
+        $extendedRow[$key] = $val;
+      }
+      array_push($extendedRows, $extendedRow);
+    }
+
+    return parent::exportData($extendedRows);
+  }
+
   /*
    * Get the actual path for the file, first looking for an override on the
    * specific import path for the column and falling back to the global import
@@ -82,7 +111,7 @@ class ExtendedCSVDataImporter extends CSVImporter {
     if (isset($this->importPaths[$column])) {
       return $this->importPaths[$column] . $path;
     }
-    
+
     return $this->globalImportPath . $path;
   }
 }
