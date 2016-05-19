@@ -48,6 +48,7 @@ abstract class RouteController extends WildcardController {
     $routes = array();
     $base = $this->resource . strtolower(get_class($this));
 
+    $wcChar = $this->getWildcardCharacter();
     foreach ($this->getRouteMethods() as $method) {
       $action = $method == 'index' ? $base : "$base/$method";
 
@@ -57,7 +58,7 @@ abstract class RouteController extends WildcardController {
 
       $params = array();
       for ($i = 1; $i <= $this->MAX_DEPTH; $i++) { // set route ation with params
-        array_push($params, ':$'.$i);
+        array_push($params, $wcChar . '$' . $i);
 
         $routes[$action . '/' . join('/', $params)] = function($context, $params) use ($method) {
           $this->$method($context, $params);

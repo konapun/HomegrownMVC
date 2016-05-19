@@ -9,7 +9,7 @@ namespace HomegrownMVC\Controller;
 abstract class WildcardController extends BaseController {
 	private $url;
 	private $wcChar = ':';
-	
+
 	/*
 	 * The concrete controller will return a map of routes to actions
 	 * the same as before, but this time the route name can include
@@ -17,14 +17,14 @@ abstract class WildcardController extends BaseController {
 	 * matched controller action
 	 */
 	abstract protected function setupWildcardRoutes();
-	
+
 	/*
 	 * Expand wildcards before passing control to the base controller
 	 */
 	final protected function setupRoutes() {
 		return $this->expandRoutes($this->url, $this->setupWildcardRoutes());
 	}
-	
+
 	/*
 	 * By default, wildcards are preceded by a colon, but you can change it
 	 * to match a different character if you'd like
@@ -35,7 +35,14 @@ abstract class WildcardController extends BaseController {
 		}
 		$this->wcChar = $char;
 	}
-	
+
+	/*
+   * Get the character which specifies a wildcard
+	 */
+	protected function getWildcardCharacter() {
+		return $this->wcChar;
+	}
+
 	/*
 	 * Attempt to match a route in this controller
 	 */
@@ -43,7 +50,7 @@ abstract class WildcardController extends BaseController {
 		$this->url = $url;
 		parent::invokeRoute($url);
 	}
-	
+
 	/*
 	 * Replace variable fields in the user-defined routes
 	 * with specific versions the BaseController can understand
@@ -53,7 +60,7 @@ abstract class WildcardController extends BaseController {
 	 * controller's invokeRoute only passes the context, we'll
 	 * need to replace the original callback with a currying
 	 * version which passes a params array
-	 * 
+	 *
 	 * Ex:
 	 * - url: www.example.com/user/1234/profile
 	 * - routes:
@@ -72,26 +79,26 @@ abstract class WildcardController extends BaseController {
 			$fieldIndex = 0;
 			$params = array(); // wildcard params
 			if (count($fields) !== $urlFieldCount) continue;
-			
+
 			$expandedRoute = array();
 			foreach ($fields as $field) {
 				if (strlen($field) > 0 && $field[0] == $this->wcChar) { // it's a wildcard
 					$val = $urlFields[$fieldIndex];
-					
+
 					$params[substr($field, 1)] = urldecode($val);
 					$field = $val;
 				}
-				
+
 				array_push($expandedRoute, $field);
 				$fieldIndex++;
 			}
-			
+
 			$expandedRoute = implode('/', $expandedRoute); // rejoin the route string
 			$expandedRoutes[$expandedRoute] = function($context) use ($params, $action) { // curry to match the signature that parent::invokeRoute understands
 				$action($context, $params);
 			};
 		}
-		
+
 		return $expandedRoutes;
 	}
 }
