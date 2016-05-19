@@ -100,7 +100,7 @@ A controller only has to define actions for routes it accepts. Arguments
 to the route are provided through the context
 
 ### Defining controllers
-Currently, three types of controllers are defined:
+Currently, four types of controllers are defined:
   * **BaseController**: Routes are literal paths
 ```php
 /*
@@ -164,6 +164,35 @@ class WrapperController extends HomegrownMVC\Controller\FrontController {
       $people = new People($dbh);
       $view->assign('administrators', $people->findByRole(People::ADMINISTRATOR)); // assuming the "administrators" variable needs to be displayed on every page
     });
+  }
+}
+```
+
+  * **RouteController**: Routes are defined on the controller's name and the public methods available from the controller.
+```php
+/*
+ * Sample RouteController demonstrating its use.
+ *
+ * This controller will match any routes of the form /people
+ */
+class People extends HomegrownMVC\Controller\RouteController {
+
+  protected function configure() {
+    $this->setResource('test'); // Setting the resource allows for nested routes. In this example, setting the resource to 'test' will match the form /test/people
+  }
+
+  /*
+   * A method named `index` will match the empty route. Parameters are passed via
+   * a params hash where $1 is the first param, $2 is the second, etc
+   */
+  function index($context, $params) {
+    echo "Matched index route for People with " . count($params) . " params";
+  }
+
+  function directory($context, $params) {
+    $sortType = isset($params['$1']) ? $params['$1'] : 'asc';
+
+    echo "Matched /people/directory/:sort route";
   }
 }
 ```

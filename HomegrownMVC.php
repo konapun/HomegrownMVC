@@ -35,6 +35,7 @@ include_once($controllerBase . 'IController.php');
 include_once($controllerBase . 'BaseController.php');
 include_once($controllerBase . 'FrontController.php');
 include_once($controllerBase . 'WildcardController.php');
+include_once($controllerBase . 'RouteController.php');
 include_once($importerBase . 'IDataImporter.php');
 include_once($importerBase . 'CSVDataImporter.php');
 include_once($importerBase . 'ExtendedCSVDataImporter.php');
