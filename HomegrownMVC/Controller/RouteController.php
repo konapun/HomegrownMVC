@@ -17,16 +17,20 @@ use HomegrownMVC\Controller\WildcardController as WildcardController;
  */
 abstract class RouteController extends WildcardController {
   private $resource;
-  private $MAX_DEPTH = 12; // The maximum number of params that can be passed via the route
+  private $initial;
+  private $maxDepth; // The maximum number of params that can be passed via the route
 
   function __construct($context) {
     parent::__construct($context);
     $this->resource = "";
+    $this->initial = 'index';
+    $this->maxDepth = 8;
     $this->configure();
   }
 
   /*
-   * Configure the controller with `setResource`, etc
+   * Configure the controller with `setResource`, `setInitialRoute`,
+   * `setMaxArgDepth`, etc.
    */
   protected function configure() {}
 
@@ -37,8 +41,33 @@ abstract class RouteController extends WildcardController {
    * You can set the resource to 'nested' to still allow the People controller
    * to be invoked
    */
-  final function setResource($resource) {
+  final protected function setResource($resource) {
     $this->resource = "$resource/";
+  }
+
+  /*
+   * Set the method name automatically invoked when this controller's base route
+   * is matched (the default is 'index')
+   */
+  final protected function setInitialRoute($route) {
+    $this->initial = $route;
+  }
+
+  /*
+   * Set the maximum number of arguments that can be passed to methods in this
+   * controller via URL segments (default 8). Note that traditional arguments
+   * passed through the request are unaffected.
+   */
+  final protected function setMaxArgDepth($depth) {
+    $this->maxDepth = $depth;
+  }
+
+  /*
+   * Return the maximum number of arguments that can be passed via URL segments
+   * to methods in this controller.
+   */
+  final protected function getMaxArgDepth() {
+    return $this->maxDepth;
   }
 
   /*
@@ -57,8 +86,8 @@ abstract class RouteController extends WildcardController {
       };
 
       $params = array();
-      for ($i = 1; $i <= $this->MAX_DEPTH; $i++) { // set route ation with params
-        array_push($params, $wcChar . '$' . $i);
+      for ($i = 0; $i < $this->getMaxArgDepth(); $i++) { // set route ation with params
+        array_push($params, $wcChar . $i);
 
         $routes[$action . '/' . join('/', $params)] = function($context, $params) use ($method) {
           $this->$method($context, $params);

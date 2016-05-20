@@ -178,19 +178,21 @@ class WrapperController extends HomegrownMVC\Controller\FrontController {
 class People extends HomegrownMVC\Controller\RouteController {
 
   protected function configure() {
+    $this->setMaxArgDepth(10); // Allow 10 URL segments to be passed as arguments to methods in this controller (default: 8)
+    $this->setInitialRoute('index'); // Automatically call the method named 'index' when matching the baseroute (default: 'index')
     $this->setResource('test'); // Setting the resource allows for nested routes. In this example, setting the resource to 'test' will match the form /test/people
   }
 
   /*
    * A method named `index` will match the empty route. Parameters are passed via
-   * a params hash where $1 is the first param, $2 is the second, etc
+   * a params hash where 0 is the first param, 1 is the second, etc
    */
   function index($context, $params) {
     echo "Matched index route for People with " . count($params) . " params";
   }
 
   function directory($context, $params) {
-    $sortType = isset($params['$1']) ? $params['$1'] : 'asc';
+    $sortType = isset($params[0]) ? $params[0] : 'asc';
 
     echo "Matched /people/directory/:sort route";
   }
