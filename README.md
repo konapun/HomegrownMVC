@@ -408,3 +408,4 @@ directory (e.g. models/data/text/person_bio.txt would be given as `file:person_b
   * Add QueryBuilder utility
   * Allow GET/POST/PATCH/DELETE etc. for route matching
   * Automatically set resources to parent's resource and classname for RouteControllers which extend concrete RouteControllers
+  * Pass parameters in RouteControllers through dedicated args rather than a param array. That way maxArgDepth can be removed.
