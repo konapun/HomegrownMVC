@@ -400,3 +400,11 @@ doing
 You can constrain included files to a certain directory when using this feature by restricting its usage to files contained
 within the `models/data/text` directory so when specifying the file to link, specify it relative to this
 directory (e.g. models/data/text/person_bio.txt would be given as `file:person_bio.txt`)
+
+## TODO
+### (devnotes)
+  * Allow defining load priorities for controllers
+  * Unify PluralModel classes
+  * Add QueryBuilder utility
+  * Allow GET/POST/PATCH/DELETE etc. for route matching
+  * Automatically set resources to parent's resource and classname for RouteControllers which extend concrete RouteControllers
