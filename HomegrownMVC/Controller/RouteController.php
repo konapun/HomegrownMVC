@@ -1,6 +1,7 @@
 <?php
 namespace HomegrownMVC\Controller;
 
+use \ReflectionClass as ReflectionClass;
 use HomegrownMVC\Controller\WildcardController as WildcardController;
 
 /*
@@ -16,14 +17,18 @@ use HomegrownMVC\Controller\WildcardController as WildcardController;
  * 		- invoke $peopleController->create($id, $name)
  */
 abstract class RouteController extends WildcardController {
+  private $reflection;
   private $resource;
   private $initial;
+  private $argsAsArray; // Pass arguments as array rather than argument list
   private $maxDepth; // The maximum number of params that can be passed via the route
 
   function __construct($context) {
     parent::__construct($context);
+    $this->reflection = new ReflectionClass($this);
     $this->resource = "";
     $this->initial = 'index';
+    $this->argsAsArray = false;
     $this->maxDepth = 8;
     $this->configure();
   }
@@ -54,11 +59,10 @@ abstract class RouteController extends WildcardController {
   }
 
   /*
-   * Set the maximum number of arguments that can be passed to methods in this
-   * controller via URL segments (default 8). Note that traditional arguments
-   * passed through the request are unaffected.
+   * Pass arguments to matched route functions as a single array
    */
-  final protected function setMaxArgDepth($depth) {
+  final protected function useArgsArray($depth=8) {
+    $this->argsAsArray = true;
     $this->maxDepth = $depth;
   }
 
@@ -75,7 +79,7 @@ abstract class RouteController extends WildcardController {
    */
   final protected function setupWildcardRoutes() {
     $routes = array();
-    $base = $this->resource . strtolower(get_class($this));
+    $base = $this->getBaseRoute();
 
     $wcChar = $this->getWildcardCharacter();
     foreach ($this->getRouteMethods() as $method) {
@@ -86,7 +90,7 @@ abstract class RouteController extends WildcardController {
       };
 
       $params = array();
-      for ($i = 0; $i < $this->getMaxArgDepth(); $i++) { // set route ation with params
+      for ($i = 0; $i < $this->getMaxArgDepth(); $i++) { // set route action with params
         array_push($params, $wcChar . $i);
 
         $routes[$action . '/' . join('/', $params)] = function($context, $params) use ($method) {
@@ -96,6 +100,24 @@ abstract class RouteController extends WildcardController {
     }
 
     return $routes;
+  }
+
+  /*
+   * Get the base route defined by this controller. If this controller is a
+   * subclass of another RouteController then its base route is the
+   * concatenation of the parent's base route with this base route.
+   */
+  protected function getBaseRoute() {
+    $baseRoute = "";
+    $classRoute = strtolower(get_class($this));
+
+    $parentClass = $this->reflection->getParentClass();
+    $parent = new ReflectionClass($parentClass);
+    if ($parent->hasMethod('getBaseRoute')) {
+      $baseRoute = $parent->getBaseRoute() . '/';
+    }
+
+    return '/' . $baseRoute . $this->resource . $classRoute;
   }
 
   /*
