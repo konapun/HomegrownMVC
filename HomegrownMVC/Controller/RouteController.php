@@ -81,20 +81,22 @@ abstract class RouteController extends WildcardController {
     $routes = array();
     $base = $this->getBaseRoute();
 
+    $reflection = $this->reflection;
     $wcChar = $this->getWildcardCharacter();
+    $argsAsArray = $this->argsAsArray;
     foreach ($this->getRouteMethods() as $method) {
       $action = $method == 'index' ? $base : "$base/$method";
 
-      $routes[$action] = function($context) use ($method) { // set route action with no params
-        $this->$method($context, array());
+      $argDepth = $argsAsArray ? $this->getMaxArgDepth() : $reflection->getMethod($method)->getNumberOfParameters()-1; // -1 for context
+      $routes[$action] = function($context) use ($method, $argsAsArray) { // set route action with no params
+        $argsAsArray ? $this->$method($context, array()) : $this->$method($context);
       };
 
       $params = array();
-      for ($i = 0; $i < $this->getMaxArgDepth(); $i++) { // set route action with params
+      for ($i = 0; $i < $argDepth; $i++) { // set route action with params
         array_push($params, $wcChar . $i);
-
-        $routes[$action . '/' . join('/', $params)] = function($context, $params) use ($method) {
-          $this->$method($context, $params);
+        $routes[$action . '/' . join('/', $params)] = function($context, $params) use ($method, $argsAsArray) {
+          $argsAsArray ? $this->$method($context, $params) : call_user_func_array(array($this, $method), array_merge(array($context), $params));
         };
       }
     }
