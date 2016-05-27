@@ -22,6 +22,7 @@ abstract class RouteController extends WildcardController {
   private $initial;
   private $argsAsArray; // Pass arguments as array rather than argument list
   private $maxDepth; // The maximum number of params that can be passed via the route
+  private $context; // The bound context within each route
 
   function __construct($context) {
     parent::__construct($context);
@@ -30,6 +31,12 @@ abstract class RouteController extends WildcardController {
     $this->initial = 'index';
     $this->argsAsArray = false;
     $this->maxDepth = 8;
+    $this->context = null;
+
+    $closure = function($context) { // Declare closure separately so $this can be bound to it to gain access to private member variables
+      $this->context = $context;
+    };
+    $this->beforeRoutes($closure->bindTo($this));
     $this->configure();
   }
 
@@ -38,6 +45,14 @@ abstract class RouteController extends WildcardController {
    * `setMaxArgDepth`, etc.
    */
   protected function configure() {}
+
+  /*
+   * Get the bound context for this route (includes the request, database
+   * handle, view engine, and stash)
+   */
+  protected function getContext() {
+    return $this->context;
+  }
 
   /*
    * Setting the resource allows handing of nested routes while still invoking
@@ -87,16 +102,16 @@ abstract class RouteController extends WildcardController {
     foreach ($this->getRouteMethods() as $method) {
       $action = $method == 'index' ? $base : "$base/$method";
 
-      $argDepth = $argsAsArray ? $this->getMaxArgDepth() : $reflection->getMethod($method)->getNumberOfParameters()-1; // -1 for context
+      $argDepth = $argsAsArray ? $this->getMaxArgDepth() : $reflection->getMethod($method)->getNumberOfParameters();
       $routes[$action] = function($context) use ($method, $argsAsArray) { // set route action with no params
-        $argsAsArray ? $this->$method($context, array()) : $this->$method($context);
+        $argsAsArray ? $this->$method(array()) : $this->$method();
       };
 
       $params = array();
       for ($i = 0; $i < $argDepth; $i++) { // set route action with params
         array_push($params, $wcChar . $i);
         $routes[$action . '/' . join('/', $params)] = function($context, $params) use ($method, $argsAsArray) {
-          $argsAsArray ? $this->$method($context, $params) : call_user_func_array(array($this, $method), array_merge(array($context), $params));
+          $argsAsArray ? $this->$method($params) : call_user_func_array(array($this, $method), array_merge($params));
         };
       }
     }
@@ -113,13 +128,15 @@ abstract class RouteController extends WildcardController {
     $baseRoute = "";
     $classRoute = strtolower(get_class($this));
 
+    // TODO: Inheritance
+    /*
     $parentClass = $this->reflection->getParentClass();
     $parent = new ReflectionClass($parentClass);
     if ($parent->hasMethod('getBaseRoute')) {
       $baseRoute = $parent->getBaseRoute() . '/';
     }
-
-    return '/' . $baseRoute . $this->resource . $classRoute;
+    */
+    return $baseRoute . $this->resource . $classRoute;
   }
 
   /*
