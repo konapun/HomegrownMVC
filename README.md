@@ -178,7 +178,6 @@ class WrapperController extends HomegrownMVC\Controller\FrontController {
 class People extends HomegrownMVC\Controller\RouteController {
 
   protected function configure() {
-    $this->setMaxArgDepth(10); // Allow 10 URL segments to be passed as arguments to methods in this controller (default: 8)
     $this->setInitialRoute('index'); // Automatically call the method named 'index' when matching the baseroute (default: 'index')
     $this->setResource('test'); // Setting the resource allows for nested routes. In this example, setting the resource to 'test' will match the form /test/people
   }
@@ -187,14 +186,14 @@ class People extends HomegrownMVC\Controller\RouteController {
    * A method named `index` will match the empty route. Parameters are passed via
    * a params hash where 0 is the first param, 1 is the second, etc
    */
-  function index($context, $params) {
-    echo "Matched index route for People with " . count($params) . " params";
+  function index($param1='first', $param2='second') {
+    echo "Matched route /test/people/$param1/$param2";
   }
 
-  function directory($context, $params) {
-    $sortType = isset($params[0]) ? $params[0] : 'asc';
+  function directory($sortType='asc') {
+    $context = $this->getContext(); // Get the context object which holds the HTTP request, view engine, database handle, and stash
 
-    echo "Matched /people/directory/:sort route";
+    echo "Matched test/people/directory/$sortType route";
   }
 }
 ```
@@ -408,4 +407,3 @@ directory (e.g. models/data/text/person_bio.txt would be given as `file:person_b
   * Add QueryBuilder utility
   * Allow GET/POST/PATCH/DELETE etc. for route matching
   * Automatically set resources to parent's resource and classname for RouteControllers which extend concrete RouteControllers
-  * Pass parameters in RouteControllers through dedicated args rather than a param array. That way maxArgDepth can be removed.
