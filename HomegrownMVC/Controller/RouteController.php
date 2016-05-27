@@ -111,7 +111,7 @@ abstract class RouteController extends WildcardController {
       for ($i = 0; $i < $argDepth; $i++) { // set route action with params
         array_push($params, $wcChar . $i);
         $routes[$action . '/' . join('/', $params)] = function($context, $params) use ($method, $argsAsArray) {
-          $argsAsArray ? $this->$method($params) : call_user_func_array(array($this, $method), array_merge($params));
+          $argsAsArray ? $this->$method($params) : call_user_func_array(array($this, $method), $params);
         };
       }
     }
